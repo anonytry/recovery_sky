@@ -55,4 +55,21 @@ on property:dev.mnt.blk.firmware=*
     wait /sys/kernel/boot_adsp/boot
     write /sys/kernel/boot_adsp/boot 1
     wait /sys/class/power_supply/battery
-# END Recovery_StabilityEnhance
+    start health-hal-2-1
+
+on property:ro.twrp.fastbootd=1
+    # Load ADSP firmware for PMIC
+    wait /sys/kernel/boot_adsp/boot
+    write /sys/kernel/boot_adsp/boot 1
+    wait /sys/class/power_supply/battery
+    start health-hal-2-1
+    umount /firmware
+
+on boot #Haptics
+    write /sys/class/leds/vibrator/trigger "transient"
+    start vendor.qti.vibrator
+
+on property:twrp.modules.loaded=true #Flashlight
+    mkdir /tmp/flashlight 
+    write /tmp/flashlight/max_brightness "1"
+    symlink /sys/devices/virtual/camera/factory_test_flash/rear_flash /tmp/flashlight/brightness
