@@ -27,6 +27,12 @@ export FOX_DELETE_AROMAFM=1
 # Misc
     # Set this to 1 to include an addon for removing factory reset protection (FRP)
 export OF_ENABLE_FRP_ADDON=1
+    # already forced reflash in /system/bin/post_rom_flash_completion.sh
+export OF_NO_REFLASH_CURRENT_ORANGEFOX=1
+    # kernalsu support
+export FOX_ENABLE_KERNELSU_SUPPORT=1
+    # maintainer
+export OF_MAINTAINER="kAiF"
 
 # Extras
 export FOX_USE_BASH_SHELL=1
@@ -36,4 +42,6 @@ export FOX_USE_SED_BINARY=1
 export FOX_USE_XZ_UTILS=1
 export FOX_USE_ZSTD_BINARY=1
 export FOX_ASH_IS_BASH=1
+export FOX_USE_BUSYBOX_BINARY=1
+export FOX_USE_GREP_BINARY=1
 export ALLOW_MISSING_DEPENDENCIES=true
