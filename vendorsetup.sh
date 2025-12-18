@@ -24,6 +24,10 @@ export OF_DEFAULT_TIMEZONE="IST-5:30"
 export FOX_USE_DATA_RECOVERY_FOR_SETTINGS=1
 export FOX_DELETE_AROMAFM=1
 
+# Misc
+    # Set this to 1 to include an addon for removing factory reset protection (FRP)
+export OF_ENABLE_FRP_ADDON=1
+
 # Extras
 export FOX_USE_BASH_SHELL=1
 export FOX_USE_NANO_EDITOR=1
