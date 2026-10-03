@@ -1,0 +1,13 @@
+# Ignore the sync/output trees a build drops next to the device tree
+/out
+/../out
+/.repo
+/Temp
+
+# Editor and OS noise
+*.swp
+*~
+.DS_Store
+
+# Stray build logs
+*.log

@@ -1,10 +1,27 @@
-export FOX_VIRTUAL_AB_DEVICE=1
-export OF_AB_DEVICE_WITH_RECOVERY_PARTITION=1
-export OF_FL_PATH1="/tmp/flashlight"
-export OF_ADVANCED_SECURITY=1
-export FOX_VARIANT="A14"
+#!/bin/bash
+#
+# Copyright (C) 2023 The OrangeFox Recovery Project
+#
+# SPDX-License-Identifier: Apache-2.0
+#
 
-# Screen Settings 
+add_lunch_combo fox_sky-eng
+add_lunch_combo fox_sky-user
+add_lunch_combo fox_sky-userdebug
+
+# Device
+export FOX_BUILD_DEVICE=sky
+
+# Variant
+export FOX_VARIANT="A16"
+export FOX_BUILD_TYPE="Stable"
+
+export FOX_AB_DEVICE=1
+export OF_AB_DEVICE_WITH_RECOVERY_PARTITION=1
+export FOX_VIRTUAL_AB_DEVICE=1
+export OF_ADVANCED_SECURITY=1
+
+# Screen
 export OF_SCREEN_H=2460
 export OF_STATUS_H=100
 export OF_STATUS_INDENT_LEFT=50
@@ -12,36 +29,65 @@ export OF_STATUS_INDENT_RIGHT=48
 export OF_HIDE_NOTCH=1
 export OF_CLOCK_POS=1
 export OF_ALLOW_DISABLE_NAVBAR=0
-
 export OF_USE_GREEN_LED=0
-export OF_ENABLE_LPTOOLS=1
-export OF_NO_TREBLE_COMPATIBILITY_CHECK=1
-export OF_UNMOUNT_SDCARDS_BEFORE_REBOOT=1
-export FOX_USE_UPDATED_MAGISKBOOT=1
 
-export OF_QUICK_BACKUP_LIST="/boot"
-export OF_DEFAULT_TIMEZONE="IST-5:30"  
+export OF_FLASHLIGHT_ENABLE=1
+export OF_FL_PATH1="/tmp/flashlight"
+
+# Backups
+export OF_QUICK_BACKUP_LIST="/boot;/vendor_boot;/recovery;/dtbo;/vbmeta;/vbmeta_system;/data;"
+export OF_DEFAULT_TIMEZONE="IST-5:30"
 export FOX_USE_DATA_RECOVERY_FOR_SETTINGS=1
-export FOX_DELETE_AROMAFM=1
+
+export OF_FORCE_DATA_FORMAT_F2FS=1
+export OF_WIPE_METADATA_AFTER_DATAFORMAT=1
+export OF_FORCE_CASEFOLDING=1
+export OF_REFRESH_ENCRYPTION_PROPS_BEFORE_FORMAT=1
+export OF_FBE_METADATA_MOUNT_IGNORE=1
+export OF_SKIP_DECRYPTED_ADOPTED_STORAGE=1
+export OF_REDUCE_DECRYPTION_TIMEOUT=1
+export OF_USE_DMCTL=1
+
+export OF_DEFAULT_KEYMASTER_VERSION=4.1
+
+# Storage
+export OF_ENABLE_USB_STORAGE=1
+export OF_UNMOUNT_SDCARDS_BEFORE_REBOOT=1
+export OF_LOOP_DEVICE_ERRORS_TO_LOG=1
+export OF_ENABLE_FS_COMPRESSION=1
+export OF_ENABLE_ALL_PARTITION_TOOLS=1
 
 # Misc
-    # Set this to 1 to include an addon for removing factory reset protection (FRP)
+export OF_USE_LZ4_COMPRESSION=1
+export FOX_USE_UPDATED_MAGISKBOOT=1
+export OF_ENABLE_LPTOOLS=1
+export OF_OPTIONS_LIST_NUM=8
+export OF_NO_TREBLE_COMPATIBILITY_CHECK=1
+export FOX_DELETE_AROMAFM=1
 export OF_ENABLE_FRP_ADDON=1
-    # already forced reflash in /system/bin/post_rom_flash_completion.sh
+export OF_USE_LOCKSCREEN_BUTTON=1
 export OF_NO_REFLASH_CURRENT_ORANGEFOX=1
-    # kernalsu support
+export FOX_INSTALLER_DISABLE_AUTOREBOOT=0
+
 export FOX_ENABLE_KERNELSU_SUPPORT=1
-    # maintainer
-export OF_MAINTAINER="kAiF"
+export FOX_ENABLE_KERNELSU_NEXT_SUPPORT=1
+
+export FOX_VANILLA_BUILD=1
+export OF_TWRP_COMPATIBILITY_MODE=1
+export OF_DISABLE_OTA_MENU=1
+
+export OF_FORCE_PREBUILT_KERNEL=1
+export OF_SKIP_PREBUILT_MODULES=1
+export OF_MAINTAINER="Sarim Rasool (@TopexGuy)"
 
 # Extras
 export FOX_USE_BASH_SHELL=1
-export FOX_USE_NANO_EDITOR=1
-export FOX_USE_TAR_BINARY=1
-export FOX_USE_SED_BINARY=1
-export FOX_USE_XZ_UTILS=1
-export FOX_USE_ZSTD_BINARY=1
 export FOX_ASH_IS_BASH=1
 export FOX_USE_BUSYBOX_BINARY=1
 export FOX_USE_GREP_BINARY=1
-export ALLOW_MISSING_DEPENDENCIES=true
+export FOX_USE_NANO_EDITOR=1
+export FOX_USE_TAR_BINARY=1
+export FOX_USE_LZ4_BINARY=1
+export FOX_USE_SED_BINARY=1
+export FOX_USE_XZ_UTILS=1
+export FOX_USE_ZSTD_BINARY=1
