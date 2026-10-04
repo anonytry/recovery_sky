@@ -1,19 +1,22 @@
-# Battery Property
+# Battery, stock suspends the charger when idle
 ro.charger.enable_suspend=1
 
-# Storage
+# Storage, values taken from the stock OS2.0.210.0.VMWMIXM dump
+# (the vendor partition there still reports Android 12, but these four
+#  values are the ones that dump actually ships)
 external_storage.projid.enabled=1
 external_storage.casefold.enabled=1
 external_storage.sdcardfs.enabled=0
+external_storage.compression.enabled=1
 
-# Crypto
+# /data encryption, stock uses the A13+ metadata scheme
 ro.crypto.allow_encrypt_override=true
-ro.crypto.dm_default_key.options_format.version=2
 ro.crypto.volume.filenames_mode=aes-256-cts
 ro.crypto.volume.metadata.method=dm-default-key
+ro.crypto.dm_default_key.options_format.version=2
 
 # Gatekeeper
 vendor.gatekeeper.disable_spu=true
 
-# USB Config
+# USB, stock uses the ffs flavour of MTP
 vendor.usb.use_ffs_mtp=1
