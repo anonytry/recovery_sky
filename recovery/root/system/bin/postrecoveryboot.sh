@@ -1,7 +1,7 @@
 #!/sbin/sh
 #
-# TODO: this kludge is needed to prevent issues with mounting
-# system and vendor in some zip installers and in the gui
+# Re-mount the dynamic partitions read-write and back again, some zip
+# installers and the GUI need them to settle before they can be used.
 #
 sleep 1
 mount -w /product > /dev/null
@@ -23,9 +23,3 @@ mkdir /tmp/install
 mkdir /tmp/install/bin
 
 exit 0
-#
-
-mount /vendor_dlkm
-
-rmmod goodix_core && insmod /vendor_dlkm/lib/modules/goodix_core.ko
-

@@ -63,6 +63,7 @@ on property:ro.twrp.fastbootd=1
     write /sys/kernel/boot_adsp/boot 1
     wait /sys/class/power_supply/battery
     start health-hal-2-1
+    start keymaster-4-1
     umount /firmware
 
 on boot #Haptics
@@ -73,3 +74,12 @@ on property:twrp.modules.loaded=true #Flashlight
     mkdir /tmp/flashlight 
     write /tmp/flashlight/max_brightness "1"
     symlink /sys/devices/virtual/camera/factory_test_flash/rear_flash /tmp/flashlight/brightness
+service keymaster-4-1 /system/bin/android.hardware.keymaster@4.1-service-qti
+    class hwservicemanager
+    user system
+    group system
+    interface android.hardware.keymaster@4.1::IKeymasterDevice/default
+    interface android.hardware.keymaster@4.0::IKeymasterDevice/default
+    interface android.hardware.keymaster@3.0::IKeymintDevice/default
+    oneshot
+    disabled
