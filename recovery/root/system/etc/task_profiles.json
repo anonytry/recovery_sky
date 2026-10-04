@@ -177,6 +177,19 @@
       ]
     },
     {
+      "Name": "MISFPerformance",
+      "Actions": [
+        {
+          "Name": "JoinCgroup",
+          "Params":
+          {
+            "Controller": "cpu",
+            "Path": "misf"
+          }
+        }
+      ]
+    },
+    {
       "Name": "RealtimePerformance",
       "Actions": [
         {
@@ -211,6 +224,19 @@
           {
             "Controller": "cpu",
             "Path": "camera-daemon/limit-level1"
+          }
+        }
+      ]
+    },
+    {
+      "Name": "CameraCapturePerformance",
+      "Actions": [
+        {
+          "Name": "JoinCgroup",
+          "Params":
+          {
+            "Controller": "cpu",
+            "Path": "camera-daemon/limit-level2"
           }
         }
       ]
@@ -425,7 +451,32 @@
         }
       ]
     },
-
+    {
+        "Name": "MultisenceCapacityLow",
+        "Actions": [
+          {
+            "Name": "JoinCgroup",
+            "Params":
+            {
+              "Controller": "cpuset",
+              "Path": "multisence-unfocus"
+            }
+          }
+        ]
+      },
+    {
+      "Name": "ProcessCapacityMISF",
+      "Actions": [
+        {
+          "Name": "JoinCgroup",
+          "Params":
+          {
+            "Controller": "cpuset",
+            "Path": "misf"
+          }
+        }
+      ]
+    },
     {
       "Name": "ServiceCapacityLow",
       "Actions": [
@@ -452,6 +503,7 @@
         }
       ]
     },
+
     {
       "Name": "CameraServiceCapacity",
       "Actions": [
@@ -694,6 +746,19 @@
       ]
     },
     {
+      "Name": "MemoryProtectedProcess",
+      "Actions": [
+        {
+          "Name": "JoinCgroup",
+          "Params":
+          {
+            "Controller": "memory",
+            "Path": "protected-app"
+          }
+        }
+      ]
+    },
+    {
       "Name": "MemoryFreezeProcess",
       "Actions": [
         {
@@ -760,6 +825,10 @@
     {
       "Name": "CPUSET_SP_RESTRICTED",
       "Profiles": [ "ServiceCapacityRestricted", "TimerSlackNormal" ]
+    },
+    {
+        "Name": "CPUSET_SP_MULTISENCE_UNFOCUS",
+        "Profiles": [ "MultisenceCapacityLow" ]
     },
     {
       "Name": "Dex2OatBootComplete",
