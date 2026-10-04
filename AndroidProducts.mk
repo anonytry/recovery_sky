@@ -1,21 +1,15 @@
 #
-# Copyright 2017 The Android Open Source Project
+# Copyright (C) 2026 The Android Open Source Project
 #
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-#      http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
+# SPDX-License-Identifier: Apache-2.0
 #
 
+# AndroidProducts.mk is what actually registers the lunches. vendorsetup.sh
+# add_lunch_combo is obsolete and ignored since android-12.1.
 PRODUCT_MAKEFILES := \
-    $(LOCAL_DIR)/twrp_sky.mk
+    $(LOCAL_DIR)/fox_sky.mk
 
 COMMON_LUNCH_CHOICES := \
-    twrp_sky-eng
+    fox_sky-eng \
+    fox_sky-user \
+    fox_sky-userdebug
