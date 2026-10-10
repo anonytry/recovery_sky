@@ -101,8 +101,9 @@ TW_SUPPORT_INPUT_AIDL_HAPTICS_FQNAME := "IVibrator/default"
 # (nvt_36672c) and FocalTech (fts_8720); the fixed modules are shipped inside
 # the recovery ramdisk (prebuilt/modules -> /vendor/lib/modules/1.1) and are
 # loaded first, so recovery touch works even on a ROM whose vendor_dlkm still
-# carries the buggy module.
-TW_LOAD_VENDOR_MODULES := "adsp_loader_dlkm.ko rproc_qcom_common.ko q6_dlkm.ko qcom_q6v5.ko qcom_q6v5_pas.ko qcom_esoc.ko qcom_sysmon.ko nvt_36672c.ko fts_8720.ko xiaomi_touch.ko xiaomi_touch_notifier.ko fpc1020_platform_tee.ko gf_spi.ko ktd3136_bl.ko leds-qpnp-vibrator-ldo.ko qti_battery_charger_main.ko cnss_prealloc.ko cnss_utils.ko cnss_nl.ko cnss_plat_ipc_qmi_svc.ko wlan_firmware_service.ko cnss2.ko qca_cld3_qca6490.ko aw87xxx_dlkm.ko"
+# carries the buggy module. The remaining modules are loaded from the ROM's
+# vendor_dlkm/vendor_boot when available.
+TW_LOAD_VENDOR_MODULES := "adsp_loader_dlkm.ko q6_dlkm.ko nvt_36672c.ko fts_8720.ko xiaomi_touch.ko xiaomi_touch_notifier.ko ktd3136_bl.ko leds-qpnp-vibrator-ldo.ko qti_battery_charger_main.ko aw87xxx_dlkm.ko"
 TW_LOAD_VENDOR_MODULES_EXCLUDE_GKI := true
 TW_LOAD_PREBUILT_MODULES_AT_FIRST := true
 
