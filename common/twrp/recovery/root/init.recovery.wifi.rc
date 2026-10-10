@@ -1,0 +1,57 @@
+# OrangeFox WLAN for QCA6490 (sm84xx / mondrian)
+#
+# IMPORTANT: nothing here runs at boot. The cnss2 / qca_cld3 modules are loaded
+# by the OrangeFox module loader and then sit idle ("deferred for calibration").
+#
+# When the user taps "Start WLAN", OrangeFox sets sys.fox.wlan.up=1 (see
+# Wlan::StartInitSupplicantService). That fires the on-block below, which brings
+# up the WLAN driver on demand and then starts the real wpa_supplicant service.
+# Doing the bring-up on demand instead of during init keeps it off the
+# boot-critical path so it can never stall/reboot recovery.
+#
+# This used to be a /system/bin/sh wrapper (mondrian_wlan_up.sh). It is now
+# native init builtins: `wait` replaces the poll loop and ${ro.boot.slot_suffix}
+# replaces getprop. Two things the shell version did cannot be expressed in
+# init's language, but neither is needed here:
+#   - the "skip if wlan0 already up" guard: StartInitSupplicantService already
+#     returns early when the service is running, so this block won't re-run.
+#   - the "skip /firmware mount if already mounted" guard: a redundant mount of
+#     an already-mounted point simply fails harmlessly.
+
+on property:sys.fox.wlan.up=1
+    # wpa_supplicant's Android ctrl_iface refuses a non-accessible control dir
+    # and crash-loops, so force the socket dir world-accessible (init's
+    # restrictive umask would otherwise leave it 0700).
+    mkdir /tmp/recovery 0777
+    mkdir /tmp/recovery/sockets 0777
+
+    # Ensure the QCA6490 firmware is reachable (modem partition). Harmless if the
+    # common init.recovery.qcom.rc already mounted it.
+    mount vfat /dev/block/bootdevice/by-name/modem${ro.boot.slot_suffix} /firmware ro
+
+    # Point the direct firmware loader at our config dir (also a ueventd dir).
+    write /sys/module/firmware_class/parameters/path /etc/firmware
+
+    # Provide the per-device WLAN MAC from the persist partition (init mkdir is
+    # not recursive, so create each level).
+    mkdir /etc/firmware/wlan 0755
+    mkdir /etc/firmware/wlan/qca_cld 0755
+    mkdir /etc/firmware/wlan/qca_cld/qca6490 0755
+    mkdir /mnt/wlan_persist 0755
+    mount ext4 /dev/block/bootdevice/by-name/persist /mnt/wlan_persist ro
+    copy /mnt/wlan_persist/qca6490/wlan_mac.bin /etc/firmware/wlan/qca_cld/qca6490/wlan_mac.bin
+    umount /mnt/wlan_persist
+
+    # Assert fs_ready -> cnss2 cold-boots, host driver creates wlan0. Then wait
+    # up to 15s for the interface (replaces the shell sleep loop).
+    write /sys/kernel/cnss/fs_ready 1
+    wait /sys/class/net/wlan0 15
+
+    start wpa_supplicant
+
+    # Reset so the next tap is a fresh 0->1 transition that re-fires this block.
+    setprop sys.fox.wlan.up 0
+
+service wpa_supplicant /system/bin/wpa_supplicant -Dnl80211 -iwlan0 -dd -O/tmp/recovery/sockets -c/vendor/etc/wifi/wpa_supplicant.conf
+    disabled
+    seclabel u:r:recovery:s0
