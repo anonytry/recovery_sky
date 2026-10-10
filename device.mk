@@ -55,3 +55,12 @@ PRODUCT_COPY_FILES += \
 # copy recovery/root/ from the device directory (if it exists)
 PRODUCT_COPY_FILES += \
     $(call find-copy-subdir-files,*,$(DEVICE_PATH)/recovery/root/,$(TARGET_COPY_OUT_RECOVERY)/root/)
+
+# Prebuilt kernel modules shipped inside the recovery ramdisk.
+# sky's Novatek (nvt_36672c) and FocalTech (fts_8720) touch drivers are
+# buggy in the stock vendor_dlkm; the fixed modules (built from the sky 5.10
+# GKI source) are staged at /vendor/lib/modules/1.1 and loaded first by the
+# OrangeFox module loader (TW_LOAD_PREBUILT_MODULES_AT_FIRST), so recovery
+# touch works regardless of the ROM's vendor_dlkm.
+PRODUCT_COPY_FILES += \
+    $(call find-copy-subdir-files,*,$(DEVICE_PATH)/prebuilt/modules,$(TARGET_COPY_OUT_RECOVERY)/root/vendor/lib/modules/1.1)
