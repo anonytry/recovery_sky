@@ -1,100 +1,111 @@
 #
-# Copyright (C) 2026 The Android Open Source Project
-# Copyright (C) 2026 SebaUbuntu's TWRP device tree generator
+# Copyright 2017 The Android Open Source Project
 #
-# SPDX-License-Identifier: Apache-2.0
+# Copyright (C) 2024-2026 The OrangeFox Recovery Project
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#      http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
 #
 
+# This contains the module build definitions for the hardware-specific
+# components for this device. The bulk of the platform configuration is
+# provided by the ported sm84xx-common tree (common/BoardConfigCommon.mk);
+# the values below are the sky (SM4450) device-specific overrides.
+
+# Device paths (also defined by device.mk; repeated here so BoardConfig is safe
+# regardless of product-config evaluation order)
 DEVICE_PATH := device/xiaomi/sky
+COMMON_PATH := $(DEVICE_PATH)/common
 
-# For building with minimal manifest
-ALLOW_MISSING_DEPENDENCIES := true
+# Inherit from common
+-include $(COMMON_PATH)/BoardConfigCommon.mk
 
-# A/B
-AB_OTA_UPDATER := true
-AB_OTA_PARTITIONS += \
-    odm \
-    vendor \
-    system_ext \
-    system \
-    product
-BOARD_USES_RECOVERY_AS_BOOT := true
+# Bootloader / platform
+TARGET_BOARD_PLATFORM := parrot
+TARGET_BOOTLOADER_BOARD_NAME := sky
+TARGET_NO_BOOTLOADER := false
+TARGET_USES_UEFI := true
+TARGET_USES_REMOTEPROC := true
+BOARD_USES_QCOM_HARDWARE := true
 
-# Architecture
+# Architecture (SM4450 "parrot": Kryo 300 / Cortex-A75)
 TARGET_ARCH := arm64
-TARGET_ARCH_VARIANT := armv8-a
+TARGET_ARCH_VARIANT := armv8-2a-dotprod
 TARGET_CPU_ABI := arm64-v8a
-TARGET_CPU_ABI2 := 
+TARGET_CPU_ABI2 :=
 TARGET_CPU_VARIANT := generic
 TARGET_CPU_VARIANT_RUNTIME := kryo300
 
 TARGET_2ND_ARCH := arm
-TARGET_2ND_ARCH_VARIANT := armv7-a-neon
+TARGET_2ND_ARCH_VARIANT := armv8-2a
 TARGET_2ND_CPU_ABI := armeabi-v7a
 TARGET_2ND_CPU_ABI2 := armeabi
 TARGET_2ND_CPU_VARIANT := generic
 TARGET_2ND_CPU_VARIANT_RUNTIME := cortex-a75
 
-# APEX
-DEXPREOPT_GENERATE_APEX_IMAGE := true
+# Kernel - prebuilt Image built from the maintained sky 5.10 GKI source.
+# sky uses a dedicated recovery partition + a GKI boot kernel, so the recovery
+# image itself is ramdisk-only (BOARD_EXCLUDE_KERNEL_FROM_RECOVERY_IMAGE, set in
+# the common config). The prebuilt kernel is still required by the build graph.
+BOARD_USES_GENERIC_KERNEL_IMAGE := true
+BOARD_KERNEL_IMAGE_NAME := Image.lz4
+BOARD_KERNEL_PAGESIZE := 4096
+TARGET_PREBUILT_KERNEL := $(DEVICE_PATH)/prebuilt/kernel
 
-# Bootloader
-TARGET_BOOTLOADER_BOARD_NAME := parrot
-TARGET_NO_BOOTLOADER := true
+# Recovery
+TARGET_OTA_ASSERT_DEVICE := sky,skyin
+TARGET_RECOVERY_FSTAB := $(COMMON_PATH)/recovery.fstab
 
 # Display
 TARGET_SCREEN_DENSITY := 440
+TARGET_SCREEN_WIDTH := 1080
+TARGET_SCREEN_HEIGHT := 2460
+DEVICE_RESOLUTION := 1080x2460
 
-# Kernel
-BOARD_BOOTIMG_HEADER_VERSION := 4
-BOARD_MKBOOTIMG_ARGS += --header_version $(BOARD_BOOTIMG_HEADER_VERSION)
-BOARD_KERNEL_IMAGE_NAME := Image
-TARGET_KERNEL_CONFIG := sky_defconfig
-TARGET_KERNEL_SOURCE := kernel/xiaomi/sky
-
-# Kernel - prebuilt
-TARGET_FORCE_PREBUILT_KERNEL := true
-ifeq ($(TARGET_FORCE_PREBUILT_KERNEL),true)
-TARGET_PREBUILT_KERNEL := $(DEVICE_PATH)/prebuilt/kernel
-endif
-
-# Partitions
-BOARD_BOOTIMAGE_PARTITION_SIZE := 104857600
+# Partition sizes (sky, SM4450)
+BOARD_BOOTIMAGE_PARTITION_SIZE := 100663296
+BOARD_KERNEL-GKI_BOOTIMAGE_PARTITION_SIZE := $(BOARD_BOOTIMAGE_PARTITION_SIZE)
+BOARD_VENDOR_BOOTIMAGE_PARTITION_SIZE := 100663296
 BOARD_RECOVERYIMAGE_PARTITION_SIZE := 104857600
-BOARD_HAS_LARGE_FILESYSTEM := true
-BOARD_SYSTEMIMAGE_PARTITION_TYPE := ext4
-BOARD_USERDATAIMAGE_FILE_SYSTEM_TYPE := ext4
-BOARD_VENDORIMAGE_FILE_SYSTEM_TYPE := ext4
-TARGET_COPY_OUT_VENDOR := vendor
-BOARD_SUPER_PARTITION_SIZE := 9126805504 # TODO: Fix hardcoded value
-BOARD_SUPER_PARTITION_GROUPS := xiaomi_dynamic_partitions
-BOARD_XIAOMI_DYNAMIC_PARTITIONS_PARTITION_LIST := system system system_ext system_ext product product mi_ext mi_ext vendor vendor odm odm
-BOARD_XIAOMI_DYNAMIC_PARTITIONS_SIZE := 9122611200 # TODO: Fix hardcoded value
+BOARD_DTBOIMG_PARTITION_SIZE := 24117248
+BOARD_USERDATAIMAGE_PARTITION_SIZE := 48318382080
+BOARD_PERSISTIMAGE_PARTITION_SIZE := 33554432
+BOARD_METADATAIMAGE_PARTITION_SIZE := 16777216
+BOARD_FLASH_BLOCK_SIZE := 262144 # (BOARD_KERNEL_PAGESIZE * 64)
 
-# Platform
-TARGET_BOARD_PLATFORM := parrot
-
-# Recovery
-TARGET_RECOVERY_PIXEL_FORMAT := RGBX_8888
-TARGET_USERIMAGES_USE_EXT4 := true
-TARGET_USERIMAGES_USE_F2FS := true
-
-# Security patch level
-VENDOR_SECURITY_PATCH := 2021-08-01
-
-# Verified Boot
-BOARD_AVB_ENABLE := true
-BOARD_AVB_MAKE_VBMETA_IMAGE_ARGS += --flags 3
-
-# Hack: prevent anti rollback
-PLATFORM_SECURITY_PATCH := 2099-12-31
-VENDOR_SECURITY_PATCH := 2099-12-31
-PLATFORM_VERSION := 16.1.0
-
-# TWRP Configuration
-TW_THEME := portrait_hdpi
-TW_EXTRA_LANGUAGES := true
+# TWRP / OrangeFox flags (sky)
+TW_FRAMERATE := 60
+TW_BRIGHTNESS_PATH := "/sys/class/backlight/panel0-backlight/brightness"
+TW_DEFAULT_BRIGHTNESS := 547
+TW_MAX_BRIGHTNESS := 2047
+TW_CUSTOM_CPU_TEMP_PATH := "/sys/devices/virtual/thermal/thermal_zone34/temp"
+TW_QCOM_ATS_OFFSET := 1666528204500
 TW_SCREEN_BLANK_ON_BOOT := true
-TW_INPUT_BLACKLIST := "hbtp_vm"
-TW_USE_TOOLBOX := true
-TW_INCLUDE_REPACKTOOLS := true
+TW_BACKUP_EXCLUSIONS := /data/fonts/files
+
+# Haptics (leds-qpnp-vibrator-ldo / qti vibrator AIDL)
+TW_SUPPORT_INPUT_AIDL_HAPTICS := true
+TW_SUPPORT_INPUT_AIDL_HAPTICS_FIX_OFF := true
+TW_SUPPORT_INPUT_AIDL_HAPTICS_FQNAME := "IVibrator/default"
+
+# Kernel modules. sky's touch panels are the buggy-in-stock Novatek
+# (nvt_36672c) and FocalTech (fts_8720); the fixed modules are shipped inside
+# the recovery ramdisk (prebuilt/modules -> /vendor/lib/modules/1.1) and are
+# loaded first, so recovery touch works even on a ROM whose vendor_dlkm still
+# carries the buggy module.
+TW_LOAD_VENDOR_MODULES := "adsp_loader_dlkm.ko rproc_qcom_common.ko q6_dlkm.ko qcom_q6v5.ko qcom_q6v5_pas.ko qcom_esoc.ko qcom_sysmon.ko nvt_36672c.ko fts_8720.ko xiaomi_touch.ko xiaomi_touch_notifier.ko fpc1020_platform_tee.ko gf_spi.ko ktd3136_bl.ko leds-qpnp-vibrator-ldo.ko qti_battery_charger_main.ko cnss_prealloc.ko cnss_utils.ko cnss_nl.ko cnss_plat_ipc_qmi_svc.ko wlan_firmware_service.ko cnss2.ko qca_cld3_qca6490.ko aw87xxx_dlkm.ko"
+TW_LOAD_VENDOR_MODULES_EXCLUDE_GKI := true
+TW_LOAD_PREBUILT_MODULES_AT_FIRST := true
+
+# Logging
+TARGET_USES_LOGD := true
+TWRP_INCLUDE_LOGCAT := true
