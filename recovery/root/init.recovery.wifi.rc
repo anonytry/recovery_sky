@@ -1,0 +1,44 @@
+# OrangeFox WLAN for sky (adrastea / icnss2)
+#
+# IMPORTANT: nothing here runs at boot. The icnss2 / qca_cld3 modules are loaded
+# by the OrangeFox module loader and then sit idle ("deferred for calibration").
+#
+# When the user taps "Start WLAN", OrangeFox sets sys.fox.wlan.up=1 (see
+# Wlan::StartInitSupplicantService). That fires the on-block below, which brings
+# up the WLAN driver on demand and then starts the real wpa_supplicant service.
+# Doing the bring-up on demand instead of during init keeps it off the
+# boot-critical path so it can never stall/reboot recovery.
+
+on property:sys.fox.wlan.up=1
+    # wpa_supplicant's Android ctrl_iface refuses a non-accessible control dir
+    # and crash-loops, so force the socket dir world-accessible (init's
+    # restrictive umask would otherwise leave it 0700).
+    mkdir /tmp/recovery 0777
+    mkdir /tmp/recovery/sockets 0777
+
+    # Ensure the WLAN firmware is reachable (modem partition). Harmless if the
+    # common init.recovery.qcom.rc already mounted it.
+    mount vfat /dev/block/bootdevice/by-name/modem${ro.boot.slot_suffix} /firmware ro
+
+    # Point the direct firmware loader at our config dir (also a ueventd dir).
+    write /sys/module/firmware_class/parameters/path /etc/firmware
+
+    # Cold-boot the WLAN firmware. sky (adrastea) uses the icnss2 platform
+    # driver (wpss_boot, per stock ueventd); stock also writes the legacy cnss
+    # fs_ready node, so do both. A write to a missing node is a no-op.
+    chmod 222 /sys/bus/platform/drivers/icnss2/18800000.qcom,icnss/wpss_boot
+    write /sys/bus/platform/drivers/icnss2/18800000.qcom,icnss/wpss_boot 1
+    chmod 222 /sys/kernel/cnss/fs_ready
+    write /sys/kernel/cnss/fs_ready 1
+
+    # Wait up to 15s for the interface (replaces the shell sleep loop).
+    wait /sys/class/net/wlan0 15
+
+    start wpa_supplicant
+
+    # Reset so the next tap is a fresh 0->1 transition that re-fires this block.
+    setprop sys.fox.wlan.up 0
+
+service wpa_supplicant /system/bin/wpa_supplicant -Dnl80211 -iwlan0 -dd -O/tmp/recovery/sockets -c/vendor/etc/wifi/wpa_supplicant.conf
+    disabled
+    seclabel u:r:recovery:s0
