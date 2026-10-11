@@ -63,6 +63,15 @@ if [ "$1" = "$FDEVICE" -o "$FOX_BUILD_DEVICE" = "$FDEVICE" ]; then
 	# keymaster version shipped by the stock ROM
 	export OF_DEFAULT_KEYMASTER_VERSION=4.1
 
+	# build variant/type; this tree builds both the 12.1 and 16.0 manifests
+	# (the CI exports MANIFEST_BRANCH), so label each build accordingly
+	if [ "$MANIFEST_BRANCH" = "16.0" ]; then
+		export FOX_VARIANT="A16"
+	else
+		export FOX_VARIANT="A12"
+	fi
+	export FOX_BUILD_TYPE="Stable"
+
 	# early settings
 	export FOX_ALLOW_EARLY_SETTINGS_LOAD=1
 
