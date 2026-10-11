@@ -20,7 +20,6 @@
 
 #set -o xtrace
 FDEVICE="sky"
-THIS_DEVICE=${BASH_ARGV[2]}
 
 fox_get_target_device() {
   if echo "$BASH_SOURCE" | grep -q "/$FDEVICE/"; then
@@ -39,11 +38,6 @@ if [ -z "$1" -a -z "$FOX_BUILD_DEVICE" ]; then
 fi
 
 if [ "$1" = "$FDEVICE" -o "$FOX_BUILD_DEVICE" = "$FDEVICE" ]; then
-	if [ -z "$THIS_DEVICE" ]; then
-		echo "ERROR! This script requires bash. Run '/bin/bash' and build again."
-		exit 1
-	fi
-
 	export FOX_VIRTUAL_AB_DEVICE=1
 	export FOX_VANILLA_BUILD=1
 	export FOX_ENABLE_APP_MANAGER=1
@@ -62,6 +56,12 @@ if [ "$1" = "$FDEVICE" -o "$FOX_BUILD_DEVICE" = "$FDEVICE" ]; then
 	export FOX_USE_BUSYBOX_BINARY=1
 	export FOX_SETTINGS_ROOT_DIRECTORY=/data/recovery
 	export FOX_MISCELLANEOUS_ROOT_DIRECTORY=/sdcard
+
+	# maintainer identity
+	export OF_MAINTAINER="Sarim Rasool (@TopexGuy)"
+
+	# keymaster version shipped by the stock ROM
+	export OF_DEFAULT_KEYMASTER_VERSION=4.1
 
 	# early settings
 	export FOX_ALLOW_EARLY_SETTINGS_LOAD=1
