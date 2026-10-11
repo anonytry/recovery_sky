@@ -64,3 +64,26 @@ PRODUCT_COPY_FILES += \
 # touch works regardless of the ROM's vendor_dlkm.
 PRODUCT_COPY_FILES += \
     $(call find-copy-subdir-files,*,$(DEVICE_PATH)/prebuilt/modules,$(TARGET_COPY_OUT_RECOVERY)/root/vendor/lib/modules/1.1)
+
+# AIDL interface stubs for the prebuilt QTI security HALs.
+#
+# The keymint, vibrator and wifi-keystore binaries shipped in this tree are
+# linked against the "-ndk_platform" AIDL interface variants. AOSP 12L and
+# earlier install those variants into the recovery image, but Android 14
+# (API 34) and later no longer do, which would leave the HALs unable to link
+# and stall the recovery boot. Stage self-contained copies for those platforms
+# only; on older platforms the platform-provided libraries are used unchanged.
+ifeq ($(shell [ -n "$(PLATFORM_SDK_VERSION)" ] && [ "$(PLATFORM_SDK_VERSION)" -ge 34 ] && echo yes),yes)
+SKY_AIDL_PLATFORM_STUBS := true
+else ifneq ($(filter A14 A15 A16 A17 A18,$(FOX_VARIANT)),)
+SKY_AIDL_PLATFORM_STUBS := true
+endif
+
+ifdef SKY_AIDL_PLATFORM_STUBS
+PRODUCT_COPY_FILES += \
+    $(DEVICE_PATH)/prebuilt/aidl/lib64/android.hardware.security.keymint-V1-ndk_platform.so:$(TARGET_COPY_OUT_RECOVERY)/root/system/lib64/android.hardware.security.keymint-V1-ndk_platform.so \
+    $(DEVICE_PATH)/prebuilt/aidl/lib64/android.hardware.security.secureclock-V1-ndk_platform.so:$(TARGET_COPY_OUT_RECOVERY)/root/system/lib64/android.hardware.security.secureclock-V1-ndk_platform.so \
+    $(DEVICE_PATH)/prebuilt/aidl/lib64/android.hardware.security.sharedsecret-V1-ndk_platform.so:$(TARGET_COPY_OUT_RECOVERY)/root/system/lib64/android.hardware.security.sharedsecret-V1-ndk_platform.so \
+    $(DEVICE_PATH)/prebuilt/aidl/lib64/android.hardware.vibrator-V2-ndk_platform.so:$(TARGET_COPY_OUT_RECOVERY)/root/system/lib64/android.hardware.vibrator-V2-ndk_platform.so \
+    $(DEVICE_PATH)/prebuilt/aidl/lib64/android.system.keystore2-V1-ndk_platform.so:$(TARGET_COPY_OUT_RECOVERY)/root/system/lib64/android.system.keystore2-V1-ndk_platform.so
+endif
