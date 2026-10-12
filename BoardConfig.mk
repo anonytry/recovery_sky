@@ -16,13 +16,9 @@
 # limitations under the License.
 #
 
-# This contains the module build definitions for the hardware-specific
-# components for this device. The bulk of the platform configuration is
-# provided by the ported sm84xx-common tree (common/BoardConfigCommon.mk);
-# the values below are the sky (SM4450) device-specific overrides.
+# sky (SM4450) board configuration; platform defaults come from common/
 
-# Device paths (also defined by device.mk; repeated here so BoardConfig is safe
-# regardless of product-config evaluation order)
+# Device paths
 DEVICE_PATH := device/xiaomi/sky
 COMMON_PATH := $(DEVICE_PATH)/common
 
@@ -37,7 +33,7 @@ TARGET_USES_UEFI := true
 TARGET_USES_REMOTEPROC := true
 BOARD_USES_QCOM_HARDWARE := true
 
-# Architecture (SM4450 "parrot": Kryo 300 / Cortex-A75)
+# Architecture
 TARGET_ARCH := arm64
 TARGET_ARCH_VARIANT := armv8-2a-dotprod
 TARGET_CPU_ABI := arm64-v8a

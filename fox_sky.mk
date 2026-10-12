@@ -34,10 +34,10 @@ PRODUCT_GMS_CLIENTID_BASE := android-xiaomi
 
 DEVICE_RESOLUTION := 1080x2460
 
-# Stock fingerprint from the OS2.0.210.0.VMWMIXM dump
+# Stock fingerprint
 BUILD_FINGERPRINT := Xiaomi/sky/missi:15/AQ3A.240912.001/OS2.0.210.0.VMWMIXM:user/release-keys
 
-# ----- OrangeFox settings (ported from OrangeFox/device/garnet fox_16.0) -----
+# OrangeFox settings
 
 # screen settings
 OF_SCREEN_H := 2460
