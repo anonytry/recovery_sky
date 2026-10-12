@@ -53,6 +53,12 @@ OF_QUICK_BACKUP_LIST := /boot;/data;
 OF_ENABLE_LPTOOLS := 1
 OF_NO_TREBLE_COMPATIBILITY_CHECK := 1
 
+# flashlight
+OF_FL_PATH1 := /tmp/flashlight
+
+# default time zone
+OF_DEFAULT_TIMEZONE := IST-5:30
+
 # number of list options before scrollbar creation
 OF_OPTIONS_LIST_NUM := 9
 

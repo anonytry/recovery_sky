@@ -92,6 +92,15 @@ TW_QCOM_ATS_OFFSET := 1666528204500
 TW_SCREEN_BLANK_ON_BOOT := true
 TW_BACKUP_EXCLUSIONS := /data/fonts/files
 
+# read battery/charging state from sysfs
+TW_USE_LEGACY_BATTERY_SERVICES := true
+
+# add UTC+5:30 to the theme timezone list
+BOARD_RECOVERY_IMAGE_PREPARE += f=$(TARGET_RECOVERY_ROOT_OUT)/twres/pages/settings.xml; if [ -f "$$f" ] && ! grep -q 'IST-5:30' "$$f"; then sed -i 's%<listitem name="{@utcp6}">%<listitem name="India (UTC+5:30)">IST-5:30</listitem><listitem name="{@utcp6}">%' "$$f"; fi;
+
+# keep the custom maintainer avatar over the theme default
+BOARD_RECOVERY_IMAGE_PREPARE += cp -f $(DEVICE_PATH)/recovery/root/twres/images/Default/About/maintainer.png $(TARGET_RECOVERY_ROOT_OUT)/twres/images/Default/About/maintainer.png;
+
 # Haptics (leds-qpnp-vibrator-ldo / qti vibrator AIDL)
 TW_SUPPORT_INPUT_AIDL_HAPTICS := true
 TW_SUPPORT_INPUT_AIDL_HAPTICS_FIX_OFF := true
