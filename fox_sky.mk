@@ -47,6 +47,8 @@ OF_STATUS_INDENT_LEFT := 56
 OF_STATUS_INDENT_RIGHT := 48
 OF_ALLOW_DISABLE_NAVBAR := 0
 OF_USE_GREEN_LED := 0
+OF_CLOCK_POS := 1
+OF_USE_LOCKSCREEN_BUTTON := 1
 
 # other stuff
 OF_QUICK_BACKUP_LIST := /boot;/data;
@@ -81,6 +83,10 @@ OF_LOOP_DEVICE_ERRORS_TO_LOG := 1
 # lz4 compression
 OF_USE_LZ4_COMPRESSION := 1
 
+# the recovery image is assembled around the kernel shipped in the device tree,
+# so stop the build from trying to derive a kernel config for it
+OF_FORCE_PREBUILT_KERNEL := 1
+
 # build all the partition tools
 OF_ENABLE_ALL_PARTITION_TOOLS := 1
 
@@ -92,6 +98,10 @@ OF_USE_DMCTL := 1
 
 # require rebooting recovery after flashing a ROM
 OF_BLOCK_OPERATIONS_AFTER_ROM_FLASH := 1
+
+# the recovery copy is preserved and restored to both slots by the post-install
+# hook, so OrangeFox does not also have to reflash itself after a ROM install
+OF_NO_REFLASH_CURRENT_ORANGEFOX := 1
 
 # force unmount sdcards before rebooting
 OF_UNMOUNT_SDCARDS_BEFORE_REBOOT := 1

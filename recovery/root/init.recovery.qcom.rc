@@ -29,6 +29,11 @@
 import /init.recovery.qcom_decrypt.rc
 import /init.recovery.wifi.rc
 
+on early-init
+    # Point the direct firmware loader at the sysfs fallback before any driver
+    # can ask for firmware; the ADSP and PMIC images live on the modem partition.
+    write /proc/sys/kernel/firmware_config/force_sysfs_fallback 1
+
 on init
     start boot-hal-1-2
     write /sys/class/backlight/panel0-backlight/brightness 200
@@ -36,7 +41,11 @@ on init
 on fs
     wait /dev/block/platform/soc/${ro.boot.bootdevice}
     symlink /dev/block/platform/soc/${ro.boot.bootdevice} /dev/block/bootdevice
-    write /proc/sys/kernel/firmware_config/force_sysfs_fallback 1
+    # Mount the modem partition here and leave it up. The ADSP images are read
+    # from it while the charger probes, so tearing it down in the same trigger
+    # that kicked the load off can cut that short.
+    mkdir /firmware
+    mount vfat /dev/block/bootdevice/by-name/modem${ro.boot.slot_suffix} /firmware ro
 
 on early-boot
     chown system system /sys/class/leds/vibrator/vmax_mv
@@ -52,9 +61,6 @@ on boot
     write /sys/class/leds/vibrator/trigger "transient"
 
 on property:twrp.modules.loaded=true
-    # Mount firmware
-    mkdir /firmware
-    mount vfat /dev/block/bootdevice/by-name/modem${ro.boot.slot_suffix} /firmware ro
     # Load ADSP firmware for PMIC
     wait /sys/kernel/boot_adsp/boot
     write /sys/kernel/boot_adsp/boot 1
@@ -69,4 +75,12 @@ on property:twrp.modules.loaded=true
     mkdir /tmp/flashlight
     write /tmp/flashlight/max_brightness "1"
     symlink /sys/devices/virtual/camera/factory_test_flash/rear_flash /tmp/flashlight/brightness
+
+# fastbootd boots through its own path, so give it the same charger/health
+# bring-up, and drop the modem mount before fastbootd can write to it.
+on property:ro.twrp.fastbootd=1
+    wait /sys/kernel/boot_adsp/boot
+    write /sys/kernel/boot_adsp/boot 1
+    wait /sys/class/power_supply/battery
+    start health-hal-2-1
     umount /firmware

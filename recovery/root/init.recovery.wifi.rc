@@ -16,9 +16,8 @@ on property:sys.fox.wlan.up=1
     mkdir /tmp/recovery 0777
     mkdir /tmp/recovery/sockets 0777
 
-    # Ensure the WLAN firmware is reachable (modem partition). Harmless if the
-    # common init.recovery.qcom.rc already mounted it.
-    mount vfat /dev/block/bootdevice/by-name/modem${ro.boot.slot_suffix} /firmware ro
+    # The modem partition holding the WLAN firmware is mounted early by
+    # init.recovery.qcom.rc and kept up, so it is already reachable here.
 
     # Point the direct firmware loader at our config dir (also a ueventd dir).
     write /sys/module/firmware_class/parameters/path /etc/firmware
