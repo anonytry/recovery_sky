@@ -59,6 +59,11 @@ on property:twrp.modules.loaded=true
     # Load ADSP firmware for PMIC
     wait /sys/kernel/boot_adsp/boot
     write /sys/kernel/boot_adsp/boot 1
+    # The charger driver registers the battery power_supply only after the
+    # PMIC glink handshake with the ADSP. healthd scans power_supply once at
+    # init and never rescans; starting it earlier makes it report no battery,
+    # which surfaces as -1% in the UI on devices where the race is lost.
+    wait /sys/class/power_supply/battery
     start health-hal-2-1
     start vendor.qti.vibrator
     # Flashlight
