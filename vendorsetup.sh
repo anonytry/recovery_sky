@@ -82,6 +82,13 @@ if [ "$1" = "$FDEVICE" -o "$FOX_BUILD_DEVICE" = "$FDEVICE" ]; then
 
 	# patchelf
 	export FOX_USE_PATCHELF_BINARY=1
+
+	# a full GNU grep, the newer magiskboot that very recent boot images can
+	# need, the magisk installer kept in the ramdisk, and Fox storage on /data
+	export FOX_USE_GREP_BINARY=1
+	export FOX_USE_UPDATED_MAGISKBOOT=1
+	export FOX_MOVE_MAGISK_INSTALLER_TO_RAMDISK=1
+	export FOX_USE_DATA_RECOVERY_FOR_SETTINGS=1
 else
 	if [ -z "$FOX_BUILD_DEVICE" -a -z "$BASH_SOURCE" ]; then
 		echo "I: This script requires bash. Not processing the $FDEVICE $(basename $0)"
