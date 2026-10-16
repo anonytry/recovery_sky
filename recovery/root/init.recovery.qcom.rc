@@ -52,7 +52,6 @@ on boot
     write /sys/class/leds/vibrator/trigger "transient"
 
 on property:twrp.modules.loaded=true
-    start touch_report
     # Mount firmware
     mkdir /firmware
     mount vfat /dev/block/bootdevice/by-name/modem${ro.boot.slot_suffix} /firmware ro
