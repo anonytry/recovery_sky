@@ -103,6 +103,10 @@ OF_BLOCK_OPERATIONS_AFTER_ROM_FLASH := 1
 # hook, so OrangeFox does not also have to reflash itself after a ROM install
 OF_NO_REFLASH_CURRENT_ORANGEFOX := 1
 
+# keep adb and mtp behind the recovery decryption gate. A Stable build already
+# turns this on; stating it here keeps the hardening if the build type changes.
+OF_ADVANCED_SECURITY := 1
+
 # force unmount sdcards before rebooting
 OF_UNMOUNT_SDCARDS_BEFORE_REBOOT := 1
 
