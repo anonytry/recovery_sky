@@ -50,7 +50,7 @@ BOARD_MKBOOTIMG_ARGS := --header_version $(BOARD_BOOT_HEADER_VERSION)
 BOARD_EXCLUDE_KERNEL_FROM_RECOVERY_IMAGE := true
 BOARD_KERNEL_IMAGE_NAME := kernel
 BOARD_RAMDISK_USE_LZ4 := true
-TARGET_PREBUILT_KERNEL := $(COMMON_PATH)/prebuilt/$(BOARD_KERNEL_IMAGE_NAME)
+TARGET_PREBUILT_KERNEL := $(DEVICE_PATH)/prebuilt/kernel
 
 # Partition Info
 BOARD_PROPERTY_OVERRIDES_SPLIT_ENABLED := true
@@ -141,7 +141,7 @@ TARGET_RECOVERY_QCOM_RTC_FIX := true
 TARGET_RECOVERY_PIXEL_FORMAT := RGBX_8888
 TW_THEME := portrait_hdpi
 TW_CUSTOM_CPU_TEMP_PATH := "/sys/devices/virtual/thermal/thermal_zone34/temp"
-TW_BRIGHTNESS_PATH := "/sys/devices/platform/soc/ae00000.qcom,mdss_mdp/backlight/panel0-backlight/brightness"
+TW_BRIGHTNESS_PATH := "/sys/class/backlight/panel0-backlight/brightness"
 TW_STATUS_ICONS_ALIGN := center
 TW_CUSTOM_CPU_POS := "50"
 TW_CUSTOM_CLOCK_POS := "600"
@@ -170,21 +170,16 @@ RECOVERY_LIBRARY_SOURCE_FILES += \
     $(TARGET_OUT_SHARED_LIBRARIES)/libdebuggerd_client.so \
     $(TARGET_OUT_SYSTEM_EXT_SHARED_LIBRARIES)/vendor.display.config@1.0.so \
     $(TARGET_OUT_SYSTEM_EXT_SHARED_LIBRARIES)/vendor.display.config@2.0.so
-TW_LOAD_VENDOR_MODULES := "adsp_loader_dlkm.ko rproc_qcom_common.ko q6_dlkm.ko qcom_q6v5.ko qcom_q6v5_pas.ko qcom_esoc.ko qcom_sysmon.ko goodix_core.ko goodix_fod.ko goodix_health.ko goodix_3626.ko focaltech_fts.ko focaltech_touch.ko fts_touch_spi.ko aw882xx_dlkm.ko leds-qpnp-vibrator-ldo.ko qcom-hv-haptics.ko qti_battery_charger.ko xiaomi_touch.ko hwmon.ko cnss_prealloc.ko cnss_utils.ko cnss_nl.ko mi_cnss_statistic.ko cnss_plat_ipc_qmi_svc.ko wlan_firmware_service.ko cnss2.ko qca_cld3_qca6490.ko"
+TW_LOAD_VENDOR_MODULES := "adsp_loader_dlkm.ko rproc_qcom_common.ko q6_dlkm.ko qcom_q6v5.ko qcom_q6v5_pas.ko qcom_esoc.ko qcom_sysmon.ko nvt_36672c.ko fts_8720.ko xiaomi_touch.ko xiaomi_touch_notifier.ko ktd3136_bl.ko leds-qpnp-vibrator-ldo.ko qti_battery_charger_main.ko aw87xxx_dlkm.ko cnss_prealloc.ko cnss_utils.ko cnss_nl.ko cnss_plat_ipc_qmi_svc.ko wlan_firmware_service.ko icnss2.ko cnss2.ko qca_cld3_adrastea.ko"
 TW_LOAD_VENDOR_MODULES_EXCLUDE_GKI := true
 
-# WLAN (QCA6490) - drivers loaded via TW_LOAD_VENDOR_MODULES above, brought up in
-# init.recovery.wifi.rc. OF_ENABLE_WLAN is also exported in vendorsetup.sh so
-# Soong's libguitwrp picks up -DOF_ENABLE_WLAN.
+# WLAN (adrastea / icnss2) - drivers are loaded via TW_LOAD_VENDOR_MODULES above
+# and brought up on demand by init.recovery.wifi.rc.
 OF_ENABLE_WLAN := 1
 
-# WiFi hotspot / SoftAP (QCA6490 is AP-capable). Brings up wpa_supplicant in AP
-# mode + dnsmasq as the DHCP server. Only consumed by the kati recovery module
-# (-DOF_WLAN_AP via orangefox.mk), so no Soong/vendorsetup export is needed.
+# WiFi hotspot / SoftAP (adrastea is AP-capable). Brings up wpa_supplicant in AP
+# mode plus dnsmasq as the DHCP server.
 OF_WLAN_AP := 1
-
-# (dhcptool/dhcpdbg shipping + symlink now handled globally in
-# bootable/recovery/orangefox.mk under the OF_ENABLE_WLAN block.)
 
 # TWRP Debug Flags
 #TWRP_EVENT_LOGGING := true
