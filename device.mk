@@ -56,23 +56,11 @@ PRODUCT_COPY_FILES += \
 PRODUCT_COPY_FILES += \
     $(call find-copy-subdir-files,*,$(DEVICE_PATH)/recovery/root/,$(TARGET_COPY_OUT_RECOVERY)/root/)
 
-# Prebuilt kernel modules shipped inside the recovery ramdisk.
-# sky's Novatek (nvt_36672c) and FocalTech (fts_8720) touch drivers are
-# buggy in the stock vendor_dlkm; the fixed modules (built from the sky 5.10
-# GKI source) are staged at /vendor/lib/modules/1.1 and loaded first by the
-# OrangeFox module loader (TW_LOAD_PREBUILT_MODULES_AT_FIRST), so recovery
-# touch works regardless of the ROM's vendor_dlkm.
+# prebuilt kernel modules (fixed touch drivers) staged in the ramdisk
 PRODUCT_COPY_FILES += \
     $(call find-copy-subdir-files,*,$(DEVICE_PATH)/prebuilt/modules,$(TARGET_COPY_OUT_RECOVERY)/root/vendor/lib/modules/1.1)
 
-# AIDL interface stubs for the prebuilt QTI security HALs.
-#
-# The keymint, vibrator and wifi-keystore binaries shipped in this tree are
-# linked against the "-ndk_platform" AIDL interface variants. AOSP 12L and
-# earlier install those variants into the recovery image, but Android 14
-# (API 34) and later no longer do, which would leave the HALs unable to link
-# and stall the recovery boot. Stage self-contained copies for those platforms
-# only; on older platforms the platform-provided libraries are used unchanged.
+# AIDL stubs for the prebuilt QTI security HALs (needed on A14+)
 ifeq ($(shell [ -n "$(PLATFORM_SDK_VERSION)" ] && [ "$(PLATFORM_SDK_VERSION)" -ge 34 ] && echo yes),yes)
 SKY_AIDL_PLATFORM_STUBS := true
 else ifneq ($(filter A14 A15 A16 A17 A18,$(FOX_VARIANT)),)

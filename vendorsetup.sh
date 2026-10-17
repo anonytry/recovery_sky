@@ -63,8 +63,7 @@ if [ "$1" = "$FDEVICE" -o "$FOX_BUILD_DEVICE" = "$FDEVICE" ]; then
 	# keymaster version shipped by the stock ROM
 	export OF_DEFAULT_KEYMASTER_VERSION=4.1
 
-	# build variant/type; this tree builds both the 12.1 and 16.0 manifests
-	# (the CI exports MANIFEST_BRANCH), so label each build accordingly
+	# build variant/type (the CI exports MANIFEST_BRANCH)
 	if [ "$MANIFEST_BRANCH" = "16.0" ]; then
 		export FOX_VARIANT="A16"
 	else
@@ -83,8 +82,7 @@ if [ "$1" = "$FDEVICE" -o "$FOX_BUILD_DEVICE" = "$FDEVICE" ]; then
 	# patchelf
 	export FOX_USE_PATCHELF_BINARY=1
 
-	# a full GNU grep, the newer magiskboot that very recent boot images can
-	# need, and the magisk installer kept in the ramdisk
+	# extra binaries kept in the ramdisk (grep, magiskboot, magisk installer)
 	export FOX_USE_GREP_BINARY=1
 	export FOX_USE_UPDATED_MAGISKBOOT=1
 	export FOX_MOVE_MAGISK_INSTALLER_TO_RAMDISK=1

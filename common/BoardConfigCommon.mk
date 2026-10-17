@@ -170,15 +170,13 @@ RECOVERY_LIBRARY_SOURCE_FILES += \
     $(TARGET_OUT_SHARED_LIBRARIES)/libdebuggerd_client.so \
     $(TARGET_OUT_SYSTEM_EXT_SHARED_LIBRARIES)/vendor.display.config@1.0.so \
     $(TARGET_OUT_SYSTEM_EXT_SHARED_LIBRARIES)/vendor.display.config@2.0.so
-TW_LOAD_VENDOR_MODULES := "adsp_loader_dlkm.ko rproc_qcom_common.ko q6_dlkm.ko qcom_q6v5.ko qcom_q6v5_pas.ko qcom_esoc.ko qcom_sysmon.ko nvt_36672c.ko fts_8720.ko xiaomi_touch.ko xiaomi_touch_notifier.ko ktd3136_bl.ko leds-qpnp-vibrator-ldo.ko qti_battery_charger_main.ko aw87xxx_dlkm.ko cnss_prealloc.ko cnss_utils.ko cnss_nl.ko cnss_plat_ipc_qmi_svc.ko wlan_firmware_service.ko icnss2.ko cnss2.ko qca_cld3_adrastea.ko"
+TW_LOAD_VENDOR_MODULES := "adsp_loader_dlkm.ko rproc_qcom_common.ko q6_dlkm.ko qcom_q6v5.ko qcom_q6v5_pas.ko qcom_esoc.ko qcom_sysmon.ko nvt_36672c.ko fts_8720.ko xiaomi_touch.ko xiaomi_touch_notifier.ko ktd3136_bl.ko leds-qpnp-vibrator-ldo.ko camera.ko qti_battery_charger_main.ko aw87xxx_dlkm.ko cnss_prealloc.ko cnss_utils.ko cnss_nl.ko cnss_plat_ipc_qmi_svc.ko wlan_firmware_service.ko icnss2.ko cnss2.ko qca_cld3_adrastea.ko"
 TW_LOAD_VENDOR_MODULES_EXCLUDE_GKI := true
 
-# WLAN (adrastea / icnss2) - drivers are loaded via TW_LOAD_VENDOR_MODULES above
-# and brought up on demand by init.recovery.wifi.rc.
+# WLAN (adrastea / icnss2)
 OF_ENABLE_WLAN := 1
 
-# WiFi hotspot / SoftAP (adrastea is AP-capable). Brings up wpa_supplicant in AP
-# mode plus dnsmasq as the DHCP server.
+# WiFi hotspot / SoftAP
 OF_WLAN_AP := 1
 
 # TWRP Debug Flags

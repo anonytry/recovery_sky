@@ -8,9 +8,7 @@ LOGMSG() {
 
 LOGMSG "---$SCRIPT_NAME start---"
 
-# Reset the security patch level the installer sees. A newer ROM's anti-rollback
-# check compares against the currently reported value, and a future date here
-# makes a perfectly flashable build look like a downgrade.
+# reset the SPL the installer sees, so a newer ROM is not seen as a downgrade
 LOGMSG "Resetting SPL date to prevent anti-rollback protection..."
 resetprop ro.build.version.security_patch 2022-12-31
 

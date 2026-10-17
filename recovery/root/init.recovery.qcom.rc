@@ -30,8 +30,7 @@ import /init.recovery.qcom_decrypt.rc
 import /init.recovery.wifi.rc
 
 on early-init
-    # Point the direct firmware loader at the sysfs fallback before any driver
-    # can ask for firmware; the ADSP and PMIC images live on the modem partition.
+    # firmware fallback for the ADSP/PMIC images on the modem partition
     write /proc/sys/kernel/firmware_config/force_sysfs_fallback 1
 
 on init
@@ -41,9 +40,7 @@ on init
 on fs
     wait /dev/block/platform/soc/${ro.boot.bootdevice}
     symlink /dev/block/platform/soc/${ro.boot.bootdevice} /dev/block/bootdevice
-    # Mount the modem partition here and leave it up. The ADSP images are read
-    # from it while the charger probes, so tearing it down in the same trigger
-    # that kicked the load off can cut that short.
+    # mount the modem partition and keep it up for the ADSP images
     mkdir /firmware
     mount vfat /dev/block/bootdevice/by-name/modem${ro.boot.slot_suffix} /firmware ro
 
@@ -61,23 +58,19 @@ on boot
     write /sys/class/leds/vibrator/trigger "transient"
 
 on property:twrp.modules.loaded=true
-    # Load ADSP firmware for PMIC
-    wait /sys/kernel/boot_adsp/boot
-    write /sys/kernel/boot_adsp/boot 1
-    # The charger driver registers the battery power_supply only after the
-    # PMIC glink handshake with the ADSP. healthd scans power_supply once at
-    # init and never rescans; starting it earlier makes it report no battery,
-    # which surfaces as -1% in the UI on devices where the race is lost.
-    wait /sys/class/power_supply/battery
-    start health-hal-2-1
-    start vendor.qti.vibrator
     # Flashlight
     mkdir /tmp/flashlight
     write /tmp/flashlight/max_brightness "1"
     symlink /sys/devices/virtual/camera/factory_test_flash/rear_flash /tmp/flashlight/brightness
+    # Load ADSP firmware for PMIC
+    wait /sys/kernel/boot_adsp/boot
+    write /sys/kernel/boot_adsp/boot 1
+    # healthd scans power_supply once, so wait for the charger to register it
+    wait /sys/class/power_supply/battery
+    start health-hal-2-1
+    start vendor.qti.vibrator
 
-# fastbootd boots through its own path, so give it the same charger/health
-# bring-up, and drop the modem mount before fastbootd can write to it.
+# fastbootd boots through its own path, so it needs the same charger bring-up
 on property:ro.twrp.fastbootd=1
     wait /sys/kernel/boot_adsp/boot
     write /sys/kernel/boot_adsp/boot 1

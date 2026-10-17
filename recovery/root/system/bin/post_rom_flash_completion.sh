@@ -21,10 +21,7 @@ else
 	LOGMSG "Unable to find OrangeFox image for restoring..."
 fi
 
-# A Virtual A/B update keeps its CoW data on /data until the new system boots
-# once. Formatting or wiping data before that deletes it, and the bootloader
-# then falls back to the previous slot so the new ROM never appears.
-# Read-only check: a no-op when no update is pending.
+# warn on a pending Virtual A/B update (read-only, no-op otherwise)
 if ls /data/gsi/ota/*-cow-img.img > /dev/null 2>&1; then
 	LOGMSG "WARNING: pending system update found in /data/gsi/ota."
 	LOGMSG "WARNING: do NOT format or wipe data before the new system boots once."

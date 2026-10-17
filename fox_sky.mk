@@ -83,8 +83,7 @@ OF_LOOP_DEVICE_ERRORS_TO_LOG := 1
 # lz4 compression
 OF_USE_LZ4_COMPRESSION := 1
 
-# the recovery image is assembled around the kernel shipped in the device tree,
-# so stop the build from trying to derive a kernel config for it
+# use the prebuilt kernel
 OF_FORCE_PREBUILT_KERNEL := 1
 
 # build all the partition tools
@@ -99,12 +98,10 @@ OF_USE_DMCTL := 1
 # require rebooting recovery after flashing a ROM
 OF_BLOCK_OPERATIONS_AFTER_ROM_FLASH := 1
 
-# the recovery copy is preserved and restored to both slots by the post-install
-# hook, so OrangeFox does not also have to reflash itself after a ROM install
+# keep the post-install hook as the only self-reflash path
 OF_NO_REFLASH_CURRENT_ORANGEFOX := 1
 
-# keep adb and mtp behind the recovery decryption gate. A Stable build already
-# turns this on; stating it here keeps the hardening if the build type changes.
+# keep adb and mtp behind the decryption gate
 OF_ADVANCED_SECURITY := 1
 
 # force unmount sdcards before rebooting

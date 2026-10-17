@@ -48,10 +48,7 @@ TARGET_2ND_CPU_ABI2 := armeabi
 TARGET_2ND_CPU_VARIANT := generic
 TARGET_2ND_CPU_VARIANT_RUNTIME := cortex-a75
 
-# Kernel - prebuilt Image built from the maintained sky 5.10 GKI source.
-# sky uses a dedicated recovery partition + a GKI boot kernel, so the recovery
-# image itself is ramdisk-only (BOARD_EXCLUDE_KERNEL_FROM_RECOVERY_IMAGE, set in
-# the common config). The prebuilt kernel is still required by the build graph.
+# Kernel
 BOARD_USES_GENERIC_KERNEL_IMAGE := true
 BOARD_KERNEL_IMAGE_NAME := Image.lz4
 BOARD_KERNEL_PAGESIZE := 4096
@@ -67,7 +64,7 @@ TARGET_SCREEN_WIDTH := 1080
 TARGET_SCREEN_HEIGHT := 2460
 DEVICE_RESOLUTION := 1080x2460
 
-# Partition sizes (sky, SM4450)
+# Partition sizes
 BOARD_BOOTIMAGE_PARTITION_SIZE := 100663296
 BOARD_KERNEL-GKI_BOOTIMAGE_PARTITION_SIZE := $(BOARD_BOOTIMAGE_PARTITION_SIZE)
 BOARD_VENDOR_BOOTIMAGE_PARTITION_SIZE := 100663296
@@ -78,7 +75,7 @@ BOARD_PERSISTIMAGE_PARTITION_SIZE := 33554432
 BOARD_METADATAIMAGE_PARTITION_SIZE := 16777216
 BOARD_FLASH_BLOCK_SIZE := 262144 # (BOARD_KERNEL_PAGESIZE * 64)
 
-# TWRP / OrangeFox flags (sky)
+# TWRP / OrangeFox flags
 TW_FRAMERATE := 60
 TW_BRIGHTNESS_PATH := "/sys/class/backlight/panel0-backlight/brightness"
 TW_DEFAULT_BRIGHTNESS := 547
@@ -102,14 +99,8 @@ TW_SUPPORT_INPUT_AIDL_HAPTICS := true
 TW_SUPPORT_INPUT_AIDL_HAPTICS_FIX_OFF := true
 TW_SUPPORT_INPUT_AIDL_HAPTICS_FQNAME := "IVibrator/default"
 
-# Kernel modules. sky's touch panels are the buggy-in-stock Novatek
-# (nvt_36672c) and FocalTech (fts_8720); the fixed modules are shipped inside
-# the recovery ramdisk (prebuilt/modules -> /vendor/lib/modules/1.1) and are
-# loaded first, so recovery touch works even on a ROM whose vendor_dlkm still
-# carries the buggy module. The remaining modules (ADSP/rproc, battery,
-# vibrator, audio and the adrastea WLAN stack) are loaded from the ROM's
-# vendor_dlkm/vendor_boot when available.
-TW_LOAD_VENDOR_MODULES := "adsp_loader_dlkm.ko rproc_qcom_common.ko q6_dlkm.ko qcom_q6v5.ko qcom_q6v5_pas.ko qcom_esoc.ko qcom_sysmon.ko nvt_36672c.ko fts_8720.ko xiaomi_touch.ko xiaomi_touch_notifier.ko ktd3136_bl.ko leds-qpnp-vibrator-ldo.ko qti_battery_charger_main.ko aw87xxx_dlkm.ko cnss_prealloc.ko cnss_utils.ko cnss_nl.ko cnss_plat_ipc_qmi_svc.ko wlan_firmware_service.ko icnss2.ko cnss2.ko qca_cld3_adrastea.ko"
+# Kernel modules (camera.ko provides the rear_flash node the flashlight needs)
+TW_LOAD_VENDOR_MODULES := "adsp_loader_dlkm.ko rproc_qcom_common.ko q6_dlkm.ko qcom_q6v5.ko qcom_q6v5_pas.ko qcom_esoc.ko qcom_sysmon.ko nvt_36672c.ko fts_8720.ko xiaomi_touch.ko xiaomi_touch_notifier.ko ktd3136_bl.ko leds-qpnp-vibrator-ldo.ko camera.ko qti_battery_charger_main.ko aw87xxx_dlkm.ko cnss_prealloc.ko cnss_utils.ko cnss_nl.ko cnss_plat_ipc_qmi_svc.ko wlan_firmware_service.ko icnss2.ko cnss2.ko qca_cld3_adrastea.ko"
 TW_LOAD_VENDOR_MODULES_EXCLUDE_GKI := true
 TW_LOAD_PREBUILT_MODULES_AT_FIRST := true
 
