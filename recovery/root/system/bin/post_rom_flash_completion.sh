@@ -21,6 +21,11 @@ else
 	LOGMSG "Unable to find OrangeFox image for restoring..."
 fi
 
+# Repair /data/system/users before the first recovery reboot.
+if [ -x /system/bin/fox_fix_data_users.sh ]; then
+	/system/bin/fox_fix_data_users.sh
+fi
+
 # warn on a pending Virtual A/B update (read-only, no-op otherwise)
 if ls /data/gsi/ota/*-cow-img.img > /dev/null 2>&1; then
 	LOGMSG "WARNING: pending system update found in /data/gsi/ota."

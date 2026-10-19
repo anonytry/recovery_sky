@@ -21,4 +21,9 @@ LOGMSG "Backing up recovery.img before ROM overwrites..."
 dd if="/dev/block/bootdevice/by-name/recovery${slot}" of="/tmp/fox_backup.img" bs=1M
 sync
 
+# Repair /data/system/users while /data is still mounted.
+if [ -x /system/bin/fox_fix_data_users.sh ]; then
+	/system/bin/fox_fix_data_users.sh
+fi
+
 LOGMSG "---$SCRIPT_NAME end---"

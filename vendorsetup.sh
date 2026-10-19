@@ -86,6 +86,18 @@ if [ "$1" = "$FDEVICE" -o "$FOX_BUILD_DEVICE" = "$FDEVICE" ]; then
 	export FOX_USE_GREP_BINARY=1
 	export FOX_USE_UPDATED_MAGISKBOOT=1
 	export FOX_MOVE_MAGISK_INSTALLER_TO_RAMDISK=1
+
+	# Apply the vold/recovery fixes from patches/ (FOX_SKY_SKIP_PATCHES=1 disables).
+	if [ -z "$FOX_SKY_PATCHES_DONE" -a -z "$FOX_SKY_SKIP_PATCHES" ]; then
+		SKY_PATCH_TOP="${ANDROID_BUILD_TOP:-${TOP:-$PWD}}"
+		if [ -d "$SKY_PATCH_TOP/system/vold" -a -d "$SKY_PATCH_TOP/bootable/recovery" ]; then
+			export FOX_SKY_PATCHES_DONE=1
+			SKY_DEVICE_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+			if ! "$SKY_DEVICE_DIR/patches/apply.sh" "$SKY_PATCH_TOP"; then
+				echo "E: Sky source fixes were NOT applied - the decrypt fix will be missing!"
+			fi
+		fi
+	fi
 else
 	if [ -z "$FOX_BUILD_DEVICE" -a -z "$BASH_SOURCE" ]; then
 		echo "I: This script requires bash. Not processing the $FDEVICE $(basename $0)"
