@@ -1,6 +1,6 @@
 # Sky source fixes
 
-Two fixes live outside the device tree. `vendorsetup.sh` applies them
+Three fixes live outside the device tree. `vendorsetup.sh` applies them
 automatically when building in a full OrangeFox tree. To apply manually:
 
     ./patches/apply.sh /path/to/android
@@ -30,6 +30,15 @@ child also keeps running recovery code after `fork()` without `exec()`, which
 triggers `libbinder ProcessState can not be used after fork`. The patch makes
 the child `_exit(1)` and makes the parent return `-1` when
 `ro.crypto.fs_crypto_blkdev` is still `error`.
+
+## 0003 - recovery: prefer the A/B payload over `update-binary`
+
+TWRP's manual ZIP installer checks `META-INF/com/google/android/update-binary`
+before it checks for an A/B payload. Payload OTAs that also carry a stub
+`update-binary` therefore run the stub on a manual flash, while ADB sideload
+uses the AOSP installer, which selects the payload from `ota-type=AB`. The two
+paths then disagree about switching the active slot. The patch prefers the
+payload (with `payload_properties.txt` and `payload.bin`) when both are present.
 
 ## Ramdisk safety net
 

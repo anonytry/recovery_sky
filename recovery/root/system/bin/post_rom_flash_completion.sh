@@ -9,14 +9,20 @@ LOGMSG() {
 LOGMSG "---$SCRIPT_NAME start---"
 
 if [ -f /tmp/fox_backup.img ]; then
-	for slot in _a _b; do
-		LOGMSG "Restoring OrangeFox to slot ${slot}..."
-		if dd if="/tmp/fox_backup.img" of="/dev/block/bootdevice/by-name/recovery${slot}" bs=1M; then
-			sync
-		else
-			LOGMSG "Failed to flash to slot ${slot}..."
-		fi
-	done
+	backup_size="$(stat -c %s /tmp/fox_backup.img 2>/dev/null || echo 0)"
+	if [ "$backup_size" -eq 104857600 ]; then
+		for slot in _a _b; do
+			LOGMSG "Restoring OrangeFox to slot ${slot}..."
+			if dd if="/tmp/fox_backup.img" of="/dev/block/bootdevice/by-name/recovery${slot}" bs=1M; then
+				sync
+			else
+				LOGMSG "Failed to flash to slot ${slot}..."
+			fi
+		done
+	else
+		LOGMSG "Recovery backup is incomplete ($backup_size bytes); skipping restore."
+		rm -f /tmp/fox_backup.img
+	fi
 else
 	LOGMSG "Unable to find OrangeFox image for restoring..."
 fi

@@ -1,0 +1,18 @@
+diff --git a/twrpinstall/twinstall.cpp b/twrpinstall/twinstall.cpp
+index 3691a2f..bcb5175 100755
+--- a/twrpinstall/twinstall.cpp
++++ b/twrpinstall/twinstall.cpp
+@@ -400,9 +400,12 @@ int TWinstall_zip(const char *path, int *wipe_cache, bool check_for_digest)
+   time_t start, stop;
+   time(&start);
+ 
++  ZipEntry64 ab_probe_entry, payload_probe_entry;
++  bool is_ab_payload = (FindEntry(Zip, std::string(AB_OTA), &ab_probe_entry) == 0) &&
++                       (FindEntry(Zip, std::string("payload.bin"), &payload_probe_entry) == 0);
+   std::string update_binary_name(UPDATE_BINARY_NAME);
+   ZipEntry64 update_binary_entry;
+-  if (FindEntry(Zip, update_binary_name, &update_binary_entry) == 0) {
++  if (!is_ab_payload && FindEntry(Zip, update_binary_name, &update_binary_entry) == 0) {
+ 		LOGINFO("Update binary zip\n");
+ 		// Additionally verify the compatibility of the package.
+ 		if (!Fox_Skip_Treble_Compatibility_Check() && !verify_package_compatibility(Zip)) {
