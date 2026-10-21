@@ -38,5 +38,6 @@ apply_patch() {
 apply_patch "system/vold" "$DEVICE_DIR/patches/0001-vold-create-data-system-users-parent.patch"
 apply_patch "bootable/recovery" "$DEVICE_DIR/patches/0002-recovery-stop-fake-fde-decrypt-success.patch"
 apply_patch "bootable/recovery" "$DEVICE_DIR/patches/0003-recovery-prefer-ab-payload.patch"
+apply_patch "bootable/recovery" "$DEVICE_DIR/patches/0004-recovery-reload-touch-before-ui.patch"
 
 echo "I: Sky source fixes are applied"

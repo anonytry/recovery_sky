@@ -1,0 +1,12 @@
+diff --git a/kernel_module_loader.cpp b/kernel_module_loader.cpp
+index fe8c826..12a012c 100644
+--- a/kernel_module_loader.cpp
++++ b/kernel_module_loader.cpp
+@@ -393,6 +393,7 @@ stage_only_exit:
+ #endif
+ 
+ exit:
++	TWFunc::RunFoxScript("/system/bin/reload_touch.sh", "");
+ 	if (ven)
+ 		ven->UnMount(false);
+ 	if (ven_dlkm)

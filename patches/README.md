@@ -52,12 +52,19 @@ back to the old slot. To reboot recovery and flash extra modules, OrangeFox
 must first be installed in the new slot. ADB sideload keeps its existing
 post-flash behavior.
 
+## 0004 - recovery: reload touch before the UI starts
+
+`KernelModuleLoader` loads the prebuilt touch modules while `/vendor` is still
+being prepared, so the FTS firmware request may fail. The reload used to run
+from `postrecoveryboot.sh` after the GUI was already up, which could make touch
+freeze. Run the same reload at the end of module loading, before the UI starts,
+and keep the post-boot call only as a marked fallback.
+
 ## Touch firmware
 
-Both FTS (`fts_8720`) and NVT (`nvt_36672c`) panels are supported. init loads
-the matching module before `/vendor` is mounted, so its firmware request fails.
-The firmware is copied to `/firmware_touch` and both modules are reloaded from
-`postrecoveryboot.sh`, before the UI starts.
+Both FTS (`fts_8720`) and NVT (`nvt_36672c`) panels are supported. The firmware
+is copied to `/firmware_touch`; the module loader reloads both drivers once
+while the firmware is reachable, before the UI starts.
 
 ## Ramdisk safety net
 

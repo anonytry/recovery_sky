@@ -5,9 +5,9 @@ if [ -x /system/bin/fox_fix_data_users.sh ]; then
 	/system/bin/fox_fix_data_users.sh
 fi
 
-# init loads the touch module before /vendor is mounted, so the FTS firmware
-# request fails. Reload it once the firmware is reachable from /system/etc.
-if [ -x /system/bin/reload_touch.sh ]; then
+# reload_touch normally runs from the module loader before the UI starts.
+# Keep this only as a fallback for builds where that hook was skipped.
+if [ ! -f /tmp/fox_touch_reloaded ] && [ -x /system/bin/reload_touch.sh ]; then
 	/system/bin/reload_touch.sh
 fi
 

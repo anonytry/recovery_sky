@@ -1,5 +1,7 @@
 #!/system/bin/sh
 
+[ -f /tmp/fox_touch_reloaded ] && exit 0
+
 LOGMSG() {
     echo "I:touch: $@" >> /tmp/recovery.log
 }
@@ -54,4 +56,5 @@ done
 if [ "$bound" -eq 1 ]; then
     umount /vendor/firmware 2>/dev/null
 fi
+touch /tmp/fox_touch_reloaded
 LOGMSG "reload done"
