@@ -5,6 +5,12 @@ if [ -x /system/bin/fox_fix_data_users.sh ]; then
 	/system/bin/fox_fix_data_users.sh
 fi
 
+# init loads the touch module before /vendor is mounted, so the FTS firmware
+# request fails. Reload it once the firmware is reachable from /system/etc.
+if [ -x /system/bin/reload_touch.sh ]; then
+	/system/bin/reload_touch.sh
+fi
+
 mkdir /data/media
 mkdir /tmp/install
 mkdir /tmp/install/bin

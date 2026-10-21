@@ -60,6 +60,15 @@ PRODUCT_COPY_FILES += \
 PRODUCT_COPY_FILES += \
     $(call find-copy-subdir-files,*,$(DEVICE_PATH)/prebuilt/modules,$(TARGET_COPY_OUT_RECOVERY)/root/vendor/lib/modules/1.1)
 
+# Keep the touch/audio firmware outside /vendor so it survives the vendor mount.
+PRODUCT_COPY_FILES += \
+    $(DEVICE_PATH)/recovery/root/vendor/firmware/aw87xxx_acf.bin:$(TARGET_COPY_OUT_RECOVERY)/root/firmware_touch/aw87xxx_acf.bin \
+    $(DEVICE_PATH)/recovery/root/vendor/firmware/focaltech_8725_fw.bin:$(TARGET_COPY_OUT_RECOVERY)/root/firmware_touch/focaltech_8725_fw.bin \
+    $(DEVICE_PATH)/recovery/root/vendor/firmware/focaltech_ft8720_hx.ini:$(TARGET_COPY_OUT_RECOVERY)/root/firmware_touch/focaltech_ft8720_hx.ini \
+    $(DEVICE_PATH)/recovery/root/vendor/firmware/focaltech_ts_fw_.bin:$(TARGET_COPY_OUT_RECOVERY)/root/firmware_touch/focaltech_ts_fw_.bin \
+    $(DEVICE_PATH)/recovery/root/vendor/firmware/novatek_ts_fw.bin:$(TARGET_COPY_OUT_RECOVERY)/root/firmware_touch/novatek_ts_fw.bin \
+    $(DEVICE_PATH)/recovery/root/vendor/firmware/novatek_ts_mp.bin:$(TARGET_COPY_OUT_RECOVERY)/root/firmware_touch/novatek_ts_mp.bin
+
 # AIDL stubs for the prebuilt QTI security HALs (needed on A14+)
 ifeq ($(shell [ -n "$(PLATFORM_SDK_VERSION)" ] && [ "$(PLATFORM_SDK_VERSION)" -ge 34 ] && echo yes),yes)
 SKY_AIDL_PLATFORM_STUBS := true

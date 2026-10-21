@@ -39,6 +39,9 @@ before it checks for an A/B payload. Payload OTAs that also carry a stub
 uses the AOSP installer, which selects the payload from `ota-type=AB`. The two
 paths then disagree about switching the active slot. The patch prefers the
 payload (with `payload_properties.txt` and `payload.bin`) when both are present.
+It also disables the automatic OrangeFox reflash for payload OTAs, so the new
+slot keeps its signed recovery image instead of having it replaced with an
+unsigned one.
 
 ## Ramdisk safety net
 
