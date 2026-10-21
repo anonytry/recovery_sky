@@ -60,6 +60,11 @@ PRODUCT_COPY_FILES += \
 PRODUCT_COPY_FILES += \
     $(call find-copy-subdir-files,*,$(DEVICE_PATH)/prebuilt/modules,$(TARGET_COPY_OUT_RECOVERY)/root/vendor/lib/modules/1.1)
 
+# Keep touch modules and firmware outside /vendor so they survive the vendor mount.
+PRODUCT_COPY_FILES += \
+    $(DEVICE_PATH)/prebuilt/modules/fts_8720.ko:$(TARGET_COPY_OUT_RECOVERY)/root/modules_touch/fts_8720.ko \
+    $(DEVICE_PATH)/prebuilt/modules/nvt_36672c.ko:$(TARGET_COPY_OUT_RECOVERY)/root/modules_touch/nvt_36672c.ko
+
 # Keep the touch/audio firmware outside /vendor so it survives the vendor mount.
 PRODUCT_COPY_FILES += \
     $(DEVICE_PATH)/recovery/root/vendor/firmware/aw87xxx_acf.bin:$(TARGET_COPY_OUT_RECOVERY)/root/firmware_touch/aw87xxx_acf.bin \

@@ -9,7 +9,8 @@ LOGMSG() {
 LOGMSG "---$SCRIPT_NAME start---"
 
 # Keep a rolling copy on internal storage so a failed flash still leaves a log.
-rm -f /tmp/fox_flash_done
+rm -f /tmp/fox_flash_done /tmp/fox_flash_success /tmp/fox_post_done
+rm -f /tmp/fox_payload_ota /tmp/fox_backup.img
 mkdir -p /sdcard/Fox/logs 2>/dev/null
 (
 	while [ ! -f /tmp/fox_flash_done ]; do

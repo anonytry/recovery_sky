@@ -41,7 +41,15 @@ paths then disagree about switching the active slot. The patch prefers the
 payload (with `payload_properties.txt` and `payload.bin`) when both are present.
 It also disables the automatic OrangeFox reflash for payload OTAs, so the new
 slot keeps its signed recovery image instead of having it replaced with an
-unsigned one.
+unsigned one. A successful payload install is marked in `/tmp`, so the
+post-flash hook only changes the active slot after `update_engine` succeeds.
+
+## Touch firmware
+
+Both FTS (`fts_8720`) and NVT (`nvt_36672c`) panels are supported. init loads
+the matching module before `/vendor` is mounted, so its firmware request fails.
+The firmware is copied to `/firmware_touch` and both modules are reloaded from
+`postrecoveryboot.sh`, before the UI starts.
 
 ## Ramdisk safety net
 

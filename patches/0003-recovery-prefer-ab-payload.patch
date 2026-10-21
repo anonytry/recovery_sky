@@ -1,5 +1,5 @@
 diff --git a/twrpinstall/twinstall.cpp b/twrpinstall/twinstall.cpp
-index 3691a2f..01d5fcd 100755
+index 3691a2f..22ee4cd 100755
 --- a/twrpinstall/twinstall.cpp
 +++ b/twrpinstall/twinstall.cpp
 @@ -400,9 +400,12 @@ int TWinstall_zip(const char *path, int *wipe_cache, bool check_for_digest)
@@ -16,12 +16,23 @@ index 3691a2f..01d5fcd 100755
  		LOGINFO("Update binary zip\n");
  		// Additionally verify the compatibility of the package.
  		if (!Fox_Skip_Treble_Compatibility_Check() && !verify_package_compatibility(Zip)) {
-@@ -433,6 +436,8 @@ int TWinstall_zip(const char *path, int *wipe_cache, bool check_for_digest)
+@@ -433,6 +436,10 @@ int TWinstall_zip(const char *path, int *wipe_cache, bool check_for_digest)
  		ZipEntry64 ab_binary_entry;
  		if (FindEntry(Zip, ab_binary_name, &ab_binary_entry) == 0) {
  			LOGINFO("AB zip\n");
-+			if (is_ab_payload)
++			if (is_ab_payload) {
++				TWFunc::Exec_Cmd("touch /tmp/fox_payload_ota");
 +				DataManager::SetValue(TW_AUTO_REFLASHTWRP_VAR, 0);
++			}
  			gui_msg(Msg(msg::kHighlight, "flash_ab_inactive=Flashing A/B zip to inactive slot: {1}")(PartitionManager.Get_Active_Slot_Display()=="A"?"B":"A"));
  			// We need this so backuptool can do its magic
  			bool system_mount_state = PartitionManager.Is_Mounted_By_Path(PartitionManager.Get_Android_Root_Path());
+@@ -452,6 +459,8 @@ int TWinstall_zip(const char *path, int *wipe_cache, bool check_for_digest)
+ 			TWFunc::IsRecoveryOverwritten(true);
+ 
+ 			ret_val = Run_Update_Binary(path, wipe_cache, AB_OTA_ZIP_TYPE);
++			if (ret_val == INSTALL_SUCCESS && is_ab_payload)
++				TWFunc::Exec_Cmd("touch /tmp/fox_flash_success");
+ 
+ 			DataManager::SetValue(FOX_ZIP_INSTALLER_CODE, 1); // mark as custom ROM install
+ 
