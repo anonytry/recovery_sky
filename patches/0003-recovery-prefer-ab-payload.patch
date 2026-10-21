@@ -1,5 +1,5 @@
 diff --git a/twrpinstall/twinstall.cpp b/twrpinstall/twinstall.cpp
-index 3691a2f..b1de87b 100755
+index 3691a2f..9272a8b 100755
 --- a/twrpinstall/twinstall.cpp
 +++ b/twrpinstall/twinstall.cpp
 @@ -400,9 +400,12 @@ int TWinstall_zip(const char *path, int *wipe_cache, bool check_for_digest)
@@ -28,7 +28,7 @@ index 3691a2f..b1de87b 100755
  			gui_msg(Msg(msg::kHighlight, "flash_ab_inactive=Flashing A/B zip to inactive slot: {1}")(PartitionManager.Get_Active_Slot_Display()=="A"?"B":"A"));
  			// We need this so backuptool can do its magic
  			bool system_mount_state = PartitionManager.Is_Mounted_By_Path(PartitionManager.Get_Android_Root_Path());
-@@ -452,8 +460,16 @@ int TWinstall_zip(const char *path, int *wipe_cache, bool check_for_digest)
+@@ -452,8 +460,17 @@ int TWinstall_zip(const char *path, int *wipe_cache, bool check_for_digest)
  			TWFunc::IsRecoveryOverwritten(true);
  
  			ret_val = Run_Update_Binary(path, wipe_cache, AB_OTA_ZIP_TYPE);
@@ -40,9 +40,10 @@ index 3691a2f..b1de87b 100755
 +			// A manual payload flash must not run the OrangeFox post-install
 +			// hooks (AVB patching, recovery rewrite, extra slot writes). Keep
 +			// the sideload path unchanged.
-+			if (is_ab_payload && !is_sideload)
++			if (is_ab_payload && !is_sideload) {
 +				DataManager::SetValue(FOX_ZIP_INSTALLER_CODE, 0);
-+			else
++				TWFunc::RunFoxScript("/system/bin/post_rom_flash_completion.sh", path);
++			} else
 +				DataManager::SetValue(FOX_ZIP_INSTALLER_CODE, 1); // mark as custom ROM install
  
  			umount("/system/bin/sh");

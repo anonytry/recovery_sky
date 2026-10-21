@@ -44,13 +44,14 @@ slot keeps its signed recovery image instead of having it replaced with an
 unsigned one. A successful payload install is marked in `/tmp`, so the
 post-flash hook only touches the slot after `update_engine` succeeds.
 
-For a manual payload flash, `post_rom_flash_completion.sh` leaves the slot set
-by `update_engine` alone and does not force a reboot. The user can choose the
-reboot target. Booting the new system once is the safe default: rebooting
-recovery or formatting data before the first boot can make the bootloader fall
-back to the old slot. To reboot recovery and flash extra modules, OrangeFox
-must first be installed in the new slot. ADB sideload keeps its existing
-post-flash behavior.
+For a manual payload flash, `TWinstall_zip` calls
+`post_rom_flash_completion.sh` directly after skipping the OrangeFox post-install
+hooks. The script leaves the slot set by `update_engine` alone, writes the
+flash log, and does not force a reboot. The user can choose the reboot target.
+Booting the new system once is the safe default: rebooting recovery or
+formatting data before the first boot can make the bootloader fall back to the
+old slot. To reboot recovery and flash extra modules, OrangeFox must first be
+installed in the new slot. ADB sideload keeps its existing post-flash behavior.
 
 ## 0004 - recovery: reload touch before the UI starts
 
