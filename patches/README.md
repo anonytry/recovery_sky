@@ -45,9 +45,12 @@ unsigned one. A successful payload install is marked in `/tmp`, so the
 post-flash hook only touches the slot after `update_engine` succeeds.
 
 For a manual payload flash, `post_rom_flash_completion.sh` leaves the slot set
-by `update_engine` alone and reboots to system. Rebooting to recovery or
-formatting data before the new system boots once can make the bootloader fall
-back to the old slot. ADB sideload keeps its existing post-flash behavior.
+by `update_engine` alone and does not force a reboot. The user can choose the
+reboot target. Booting the new system once is the safe default: rebooting
+recovery or formatting data before the first boot can make the bootloader fall
+back to the old slot. To reboot recovery and flash extra modules, OrangeFox
+must first be installed in the new slot. ADB sideload keeps its existing
+post-flash behavior.
 
 ## Touch firmware
 

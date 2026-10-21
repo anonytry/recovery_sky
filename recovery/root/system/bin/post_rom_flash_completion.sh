@@ -28,7 +28,6 @@ case "$1" in
     /sideload/*) is_sideload=1 ;;
     *) is_sideload=0 ;;
 esac
-auto_reboot=0
 
 LOGMSG "---$SCRIPT_NAME start---"
 log_slot_state
@@ -58,7 +57,8 @@ if [ -f /tmp/fox_payload_ota ]; then
             # Manual payload flash: update_engine already set the slot. Do not
             # touch it again; the legacy boot HAL can make a re-assert fall back.
             LOGMSG "Manual payload OTA: update_engine selected the new slot; not reasserting it."
-            auto_reboot=1
+            LOGMSG "Manual payload OTA: reboot to system for the first boot."
+            LOGMSG "Manual payload OTA: to reboot recovery and flash extra modules, install OrangeFox in the new slot first."
         fi
     else
         LOGMSG "Payload install did not report success; not changing the active slot."
@@ -106,16 +106,3 @@ for dir in /sdcard /data/media/0; do
     fi
 done
 sync
-
-if [ "$auto_reboot" -eq 1 ]; then
-    # The new slot's recovery is the ROM's signed recovery, not OrangeFox.
-    # Booting recovery first can make the bootloader fall back to the old slot;
-    # formatting data before the first system boot also destroys the update.
-    LOGMSG "Manual payload OTA: rebooting to system for the first boot."
-    sync
-    if /system/bin/reboot system; then
-        sleep 5
-    else
-        LOGMSG "Automatic reboot failed; reboot to system, not recovery, before formatting data."
-    fi
-fi
