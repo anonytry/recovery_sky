@@ -21,7 +21,9 @@ mkdir -p /sdcard/Fox/logs 2>/dev/null
 ) </dev/null >/dev/null 2>&1 &
 
 # Payload OTAs use update_engine and do not need the recovery SPL lowered.
-if [ -n "$1" ] && unzip -l "$1" 2>/dev/null | grep -q -e 'payload.bin' -e 'payload_properties.txt'; then
+# The installer already creates the marker; keep it even if unzip cannot read
+# the package path (for example, a FUSE sideload path).
+if [ -f /tmp/fox_payload_ota ] || { [ -n "$1" ] && unzip -l "$1" 2>/dev/null | grep -q -e 'payload.bin' -e 'payload_properties.txt'; }; then
 	payload=1
 	: > /tmp/fox_payload_ota
 	LOGMSG "Payload OTA detected; leaving SPL unchanged."

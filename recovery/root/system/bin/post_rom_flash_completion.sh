@@ -24,6 +24,12 @@ if [ -f /tmp/fox_post_done ]; then
 fi
 : > /tmp/fox_post_done
 
+case "$1" in
+    /sideload/*) is_sideload=1 ;;
+    *) is_sideload=0 ;;
+esac
+auto_reboot=0
+
 LOGMSG "---$SCRIPT_NAME start---"
 log_slot_state
 
@@ -35,17 +41,24 @@ if [ -f /tmp/fox_payload_ota ]; then
     # update_engine normally sets the inactive slot. Re-assert it only after a
     # successful payload install, otherwise we could boot a partial slot.
     if [ -f /tmp/fox_flash_success ]; then
-        case "$(getprop ro.boot.slot_suffix)" in
-            _a) target_slot=1 ;;
-            _b) target_slot=0 ;;
-            *) target_slot="" ;;
-        esac
-        if [ -n "$target_slot" ] && [ -x /system/bin/bootctl ]; then
-            out="$(/system/bin/bootctl set-active-boot-slot "$target_slot" 2>&1)"
-            rc=$?
-            [ -n "$out" ] && LOGMSG "bootctl: $out"
-            LOGMSG "set-active-boot-slot $target_slot rc=$rc"
-            log_slot_state
+        if [ "$is_sideload" -eq 1 ]; then
+            case "$(getprop ro.boot.slot_suffix)" in
+                _a) target_slot=1 ;;
+                _b) target_slot=0 ;;
+                *) target_slot="" ;;
+            esac
+            if [ -n "$target_slot" ] && [ -x /system/bin/bootctl ]; then
+                out="$(/system/bin/bootctl set-active-boot-slot "$target_slot" 2>&1)"
+                rc=$?
+                [ -n "$out" ] && LOGMSG "bootctl: $out"
+                LOGMSG "set-active-boot-slot $target_slot rc=$rc"
+                log_slot_state
+            fi
+        else
+            # Manual payload flash: update_engine already set the slot. Do not
+            # touch it again; the legacy boot HAL can make a re-assert fall back.
+            LOGMSG "Manual payload OTA: update_engine selected the new slot; not reasserting it."
+            auto_reboot=1
         fi
     else
         LOGMSG "Payload install did not report success; not changing the active slot."
@@ -93,3 +106,16 @@ for dir in /sdcard /data/media/0; do
     fi
 done
 sync
+
+if [ "$auto_reboot" -eq 1 ]; then
+    # The new slot's recovery is the ROM's signed recovery, not OrangeFox.
+    # Booting recovery first can make the bootloader fall back to the old slot;
+    # formatting data before the first system boot also destroys the update.
+    LOGMSG "Manual payload OTA: rebooting to system for the first boot."
+    sync
+    if /system/bin/reboot system; then
+        sleep 5
+    else
+        LOGMSG "Automatic reboot failed; reboot to system, not recovery, before formatting data."
+    fi
+fi

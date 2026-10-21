@@ -42,7 +42,12 @@ payload (with `payload_properties.txt` and `payload.bin`) when both are present.
 It also disables the automatic OrangeFox reflash for payload OTAs, so the new
 slot keeps its signed recovery image instead of having it replaced with an
 unsigned one. A successful payload install is marked in `/tmp`, so the
-post-flash hook only changes the active slot after `update_engine` succeeds.
+post-flash hook only touches the slot after `update_engine` succeeds.
+
+For a manual payload flash, `post_rom_flash_completion.sh` leaves the slot set
+by `update_engine` alone and reboots to system. Rebooting to recovery or
+formatting data before the new system boots once can make the bootloader fall
+back to the old slot. ADB sideload keeps its existing post-flash behavior.
 
 ## Touch firmware
 
