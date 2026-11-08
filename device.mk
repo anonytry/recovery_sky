@@ -39,6 +39,15 @@ PRODUCT_COPY_FILES += \
     $(DEVICE_PATH)/prebuilt/modules/fts_8720.ko:$(TARGET_COPY_OUT_RECOVERY)/root/modules_touch/fts_8720.ko \
     $(DEVICE_PATH)/prebuilt/modules/nvt_36672c.ko:$(TARGET_COPY_OUT_RECOVERY)/root/modules_touch/nvt_36672c.ko
 
+# Persistent touch and audio firmware outside /vendor
+PRODUCT_COPY_FILES += \
+    $(DEVICE_PATH)/recovery/root/vendor/firmware/aw87xxx_acf.bin:$(TARGET_COPY_OUT_RECOVERY)/root/firmware_touch/aw87xxx_acf.bin \
+    $(DEVICE_PATH)/recovery/root/vendor/firmware/focaltech_8725_fw.bin:$(TARGET_COPY_OUT_RECOVERY)/root/firmware_touch/focaltech_8725_fw.bin \
+    $(DEVICE_PATH)/recovery/root/vendor/firmware/focaltech_ft8720_hx.ini:$(TARGET_COPY_OUT_RECOVERY)/root/firmware_touch/focaltech_ft8720_hx.ini \
+    $(DEVICE_PATH)/recovery/root/vendor/firmware/focaltech_ts_fw_.bin:$(TARGET_COPY_OUT_RECOVERY)/root/firmware_touch/focaltech_ts_fw_.bin \
+    $(DEVICE_PATH)/recovery/root/vendor/firmware/novatek_ts_fw.bin:$(TARGET_COPY_OUT_RECOVERY)/root/firmware_touch/novatek_ts_fw.bin \
+    $(DEVICE_PATH)/recovery/root/vendor/firmware/novatek_ts_mp.bin:$(TARGET_COPY_OUT_RECOVERY)/root/firmware_touch/novatek_ts_mp.bin
+
 # Boot control HAL & update tools
 PRODUCT_PACKAGES += \
     android.hardware.boot@1.0-impl \
