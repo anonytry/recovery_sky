@@ -48,6 +48,22 @@ PRODUCT_COPY_FILES += \
     $(DEVICE_PATH)/recovery/root/vendor/firmware/novatek_ts_fw.bin:$(TARGET_COPY_OUT_RECOVERY)/root/firmware_touch/novatek_ts_fw.bin \
     $(DEVICE_PATH)/recovery/root/vendor/firmware/novatek_ts_mp.bin:$(TARGET_COPY_OUT_RECOVERY)/root/firmware_touch/novatek_ts_mp.bin
 
+# AIDL stubs for prebuilt QTI security HALs (needed on A14+)
+ifeq ($(shell [ -n "$(PLATFORM_SDK_VERSION)" ] && [ "$(PLATFORM_SDK_VERSION)" -ge 34 ] && echo yes),yes)
+SKY_AIDL_PLATFORM_STUBS := true
+else ifneq ($(filter A14 A15 A16 A17 A18,$(FOX_VARIANT)),)
+SKY_AIDL_PLATFORM_STUBS := true
+endif
+
+ifdef SKY_AIDL_PLATFORM_STUBS
+PRODUCT_COPY_FILES += \
+    $(DEVICE_PATH)/prebuilt/aidl/lib64/android.hardware.security.keymint-V1-ndk_platform.so:$(TARGET_COPY_OUT_RECOVERY)/root/system/lib64/android.hardware.security.keymint-V1-ndk_platform.so \
+    $(DEVICE_PATH)/prebuilt/aidl/lib64/android.hardware.security.secureclock-V1-ndk_platform.so:$(TARGET_COPY_OUT_RECOVERY)/root/system/lib64/android.hardware.security.secureclock-V1-ndk_platform.so \
+    $(DEVICE_PATH)/prebuilt/aidl/lib64/android.hardware.security.sharedsecret-V1-ndk_platform.so:$(TARGET_COPY_OUT_RECOVERY)/root/system/lib64/android.hardware.security.sharedsecret-V1-ndk_platform.so \
+    $(DEVICE_PATH)/prebuilt/aidl/lib64/android.hardware.vibrator-V2-ndk_platform.so:$(TARGET_COPY_OUT_RECOVERY)/root/system/lib64/android.hardware.vibrator-V2-ndk_platform.so \
+    $(DEVICE_PATH)/prebuilt/aidl/lib64/android.system.keystore2-V1-ndk_platform.so:$(TARGET_COPY_OUT_RECOVERY)/root/system/lib64/android.system.keystore2-V1-ndk_platform.so
+endif
+
 # Boot control HAL & update tools
 PRODUCT_PACKAGES += \
     android.hardware.boot@1.0-impl \
