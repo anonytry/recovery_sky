@@ -1,14 +1,17 @@
 #
-# Copyright (C) 2026 The Android Open Source Project
-# Copyright (C) 2026 SebaUbuntu's TWRP device tree generator
+# Copyright (C) 2024-2026 The Android Open Source Project
+# Copyright (C) 2024-2026 The OrangeFox Recovery Project
 #
 # SPDX-License-Identifier: Apache-2.0
 #
 
 PRODUCT_MAKEFILES := \
-    $(LOCAL_DIR)/omni_sky.mk
+    $(LOCAL_DIR)/fox_sky.mk
 
 COMMON_LUNCH_CHOICES := \
-    omni_sky-user \
-    omni_sky-userdebug \
-    omni_sky-eng
+    fox_sky-user \
+    fox_sky-userdebug \
+    fox_sky-eng \
+    fox_sky-bp2a-user \
+    fox_sky-bp2a-userdebug \
+    fox_sky-bp2a-eng
