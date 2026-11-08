@@ -1,5 +1,5 @@
-# MIUI ADD: Recovery_StabilityEnhance
-# Copyright (c) 2017-2018,2020 The Linux Foundation. All rights reserved.
+# Copyright (c) 2009-2012, 2014-2015, The Linux Foundation. All rights reserved.
+# Copyright (C) 2024 The OrangeFox Recovery Project
 #
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions are met:
@@ -25,33 +25,55 @@
 # OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
 # ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #
+
+import /init.recovery.qcom_decrypt.rc
+import /init.recovery.wifi.rc
+
 on early-init
-    insmod /vendor/lib/modules/q6_pdr_dlkm.ko
-    insmod /vendor/lib/modules/q6_notifier_dlkm.ko
-    insmod /vendor/lib/modules/snd_event_dlkm.ko
-    insmod /vendor/lib/modules/gpr_dlkm.ko
-    insmod /vendor/lib/modules/spf_core_dlkm.ko
-    insmod /vendor/lib/modules/adsp_loader_dlkm.ko
+    # firmware fallback for the ADSP/PMIC images on the modem partition
+    write /proc/sys/kernel/firmware_config/force_sysfs_fallback 1
 
 on init
+    start boot-hal-1-2
     write /sys/class/backlight/panel0-backlight/brightness 200
-    setprop sys.usb.configfs 1
-
-on property:ro.boot.usbcontroller=*
-    setprop sys.usb.controller ${ro.boot.usbcontroller}
-    wait /sys/bus/platform/devices/${ro.boot.usb.dwc3_msm:-a600000.ssusb}/mode
-    write /sys/bus/platform/devices/${ro.boot.usb.dwc3_msm:-a600000.ssusb}/mode peripheral
-    wait /sys/class/udc/${ro.boot.usbcontroller} 1
 
 on fs
     wait /dev/block/platform/soc/${ro.boot.bootdevice}
     symlink /dev/block/platform/soc/${ro.boot.bootdevice} /dev/block/bootdevice
-    write /proc/sys/kernel/firmware_config/force_sysfs_fallback 1
-    mkdir /vendor/firmware_mnt
-    mkdir /vendor/firmware
-    mount_all /vendor/etc/charger_fstab.qti --early
-    mount none /vendor/firmware_mnt/image /vendor/firmware bind rec
+    # mount the modem partition and keep it up for the ADSP images
+    mkdir /firmware
+    mount vfat /dev/block/bootdevice/by-name/modem${ro.boot.slot_suffix} /firmware ro
+
+on early-boot
+    chown system system /sys/class/leds/vibrator/vmax_mv
+    chmod 0600 /sys/class/leds/vibrator/vmax_mv
+
+on boot
+    setprop sys.usb.config adb
+    setprop vendor.qcom.vibrator.led.mv_min 1600
+    setprop vendor.qcom.vibrator.led.mv_max 3000
+    setprop vendor.qcom.vibrator.led.effect_ms_multiplier 10
+    setprop vendor.qcom.vibrator.led.enable_effects true
+    write /sys/class/leds/vibrator/vmax_mv 3000
+    write /sys/class/leds/vibrator/trigger "transient"
+
+on property:twrp.modules.loaded=true
+    # Flashlight
+    mkdir /tmp/flashlight
+    write /tmp/flashlight/max_brightness "1"
+    symlink /sys/devices/virtual/camera/factory_test_flash/rear_flash /tmp/flashlight/brightness
+    # Load ADSP firmware for PMIC
+    wait /sys/kernel/boot_adsp/boot
+    write /sys/kernel/boot_adsp/boot 1
+    # healthd scans power_supply once, so wait for the charger to register it
+    wait /sys/class/power_supply/battery
+    start health-hal-2-1
+    start vendor.qti.vibrator
+
+# fastbootd boots through its own path, so it needs the same charger bring-up
+on property:ro.twrp.fastbootd=1
     wait /sys/kernel/boot_adsp/boot
     write /sys/kernel/boot_adsp/boot 1
     wait /sys/class/power_supply/battery
-# END Recovery_StabilityEnhance
+    start health-hal-2-1
+    umount /firmware

@@ -1,0 +1,27 @@
+# OrangeFox WLAN (adrastea / icnss2): bring the driver up on demand, not at boot
+
+on property:sys.fox.wlan.up=1
+    # wpa_supplicant needs a world-accessible control socket dir
+    mkdir /tmp/recovery 0777
+    mkdir /tmp/recovery/sockets 0777
+
+    # point the firmware loader at the config dir (also a ueventd dir)
+    write /sys/module/firmware_class/parameters/path /etc/firmware
+
+    # cold-boot the WLAN firmware (icnss2 wpss_boot + legacy cnss fs_ready)
+    chmod 222 /sys/bus/platform/drivers/icnss2/18800000.qcom,icnss/wpss_boot
+    write /sys/bus/platform/drivers/icnss2/18800000.qcom,icnss/wpss_boot 1
+    chmod 222 /sys/kernel/cnss/fs_ready
+    write /sys/kernel/cnss/fs_ready 1
+
+    # wait up to 15s for the interface
+    wait /sys/class/net/wlan0 15
+
+    start wpa_supplicant
+
+    # reset so the next tap is a fresh 0->1 transition
+    setprop sys.fox.wlan.up 0
+
+service wpa_supplicant /system/bin/wpa_supplicant -Dnl80211 -iwlan0 -dd -O/tmp/recovery/sockets -c/vendor/etc/wifi/wpa_supplicant.conf
+    disabled
+    seclabel u:r:recovery:s0
