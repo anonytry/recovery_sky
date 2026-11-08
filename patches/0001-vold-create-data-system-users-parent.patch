@@ -1,0 +1,19 @@
+--- a/FsCrypt.cpp
++++ b/FsCrypt.cpp
+@@ -970,6 +970,16 @@
+         }
+ 
+         if (volume_uuid.empty()) {
++            // fs_prepare_dir() is not recursive; create the missing parent.
++            if (android::vold::pathExists("/data/system") &&
++                !android::vold::pathExists("/data/system/users")) {
++                LOG(INFO) << "Creating missing /data/system/users";
++                if (!prepare_dir("/data/system/users", 0775, AID_SYSTEM, AID_SYSTEM)) {
++                    LOG(ERROR) << "Failed to create /data/system/users";
++                    return false;
++                }
++            }
++
+             if (!prepare_dir(system_legacy_path, 0700, AID_SYSTEM, AID_SYSTEM)) return false;
+             if (!prepare_dir(profiles_de_path, 0771, AID_SYSTEM, AID_SYSTEM)) return false;
+ 

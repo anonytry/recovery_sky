@@ -38,25 +38,19 @@ LOGMSG "Detecting active boot slot..."
 slot="$(getprop ro.boot.slot_suffix)"
 LOGMSG "Active boot slot: $slot"
 
-if [ "$payload" -eq 1 ]; then
-	# update_engine writes the inactive slot. Do not overwrite its recovery;
-	# the new slot keeps the ROM's own recovery (e.g. LineageOS/AOSP recovery).
-	LOGMSG "Payload OTA: skipping recovery backup; the new slot keeps the ROM's recovery."
-else
-	LOGMSG "Backing up recovery.img before ROM overwrites..."
-	if dd if="/dev/block/bootdevice/by-name/recovery${slot}" of="/tmp/fox_backup.img" bs=1M 2>/dev/null; then
-		sync
-		backup_size="$(stat -c %s /tmp/fox_backup.img 2>/dev/null || echo 0)"
-		if [ "$backup_size" -ne 104857600 ]; then
-			LOGMSG "Recovery backup is incomplete ($backup_size bytes); removing it."
-			rm -f /tmp/fox_backup.img
-		else
-			LOGMSG "Recovery backed up successfully ($backup_size bytes)."
-		fi
-	else
-		LOGMSG "Recovery backup failed; removing it."
+LOGMSG "Backing up live recovery.img into ramdisk..."
+if dd if="/dev/block/bootdevice/by-name/recovery${slot}" of="/tmp/fox_backup.img" bs=1M 2>/dev/null; then
+	sync
+	backup_size="$(stat -c %s /tmp/fox_backup.img 2>/dev/null || echo 0)"
+	if [ "$backup_size" -ne 104857600 ]; then
+		LOGMSG "Recovery backup is incomplete ($backup_size bytes); removing it."
 		rm -f /tmp/fox_backup.img
+	else
+		LOGMSG "Recovery backed up successfully ($backup_size bytes)."
 	fi
+else
+	LOGMSG "Recovery backup failed; removing it."
+	rm -f /tmp/fox_backup.img
 fi
 
 # Repair /data/system/users while /data is still mounted.

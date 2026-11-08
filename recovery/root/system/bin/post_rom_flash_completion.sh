@@ -56,9 +56,9 @@ else
     LOGMSG "E: Unable to switch active slot: target_slot='$target_slot' or bootctl missing"
 fi
 
-# For payload OTAs, leave the new slot's recovery untouched so it boots the ROM's recovery.
-# Restore OrangeFox only if not a payload OTA or if explicitly requested.
-if [ -f /tmp/fox_payload_ota ]; then
+# For payload OTAs, leave the new slot's recovery untouched so it boots the ROM's recovery,
+# UNLESS the user selected "Reflash OrangeFox after ROM" (/tmp/fox_reflash_recovery).
+if [ -f /tmp/fox_payload_ota ] && [ ! -f /tmp/fox_reflash_recovery ]; then
     LOGMSG "Payload OTA: leaving the new slot's recovery untouched (ROM recovery intact)."
 elif [ -f /tmp/fox_backup.img ]; then
     backup_size="$(stat -c %s /tmp/fox_backup.img 2>/dev/null || echo 0)"
@@ -91,7 +91,7 @@ fi
 
 LOGMSG "---$SCRIPT_NAME end---"
 : > /tmp/fox_flash_done
-rm -f /tmp/fox_payload_ota /tmp/fox_flash_success
+rm -f /tmp/fox_payload_ota /tmp/fox_flash_success /tmp/fox_reflash_recovery /tmp/fox_backup.img
 
 # Persist complete flash log before reboot
 for dir in /sdcard /data/media/0; do
