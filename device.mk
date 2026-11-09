@@ -7,11 +7,30 @@
 
 DEVICE_PATH := device/xiaomi/sky
 
+# Inherit from common AOSP config
+$(call inherit-product, $(SRC_TARGET_DIR)/product/base.mk)
+$(call inherit-product, $(SRC_TARGET_DIR)/product/core_64_bit_only.mk)
+
+# Enable project quotas and casefolding for emulated storage without sdcardfs
+$(call inherit-product, $(SRC_TARGET_DIR)/product/emulated_storage.mk)
+
 # Enable Virtual A/B OTA
 $(call inherit-product, $(SRC_TARGET_DIR)/product/virtual_ab_ota/launch_with_vendor_ramdisk.mk)
 
 # Enable APEX updates
 $(call inherit-product, $(SRC_TARGET_DIR)/product/updatable_apex.mk)
+
+# Platform & Dynamic Partitions
+PRODUCT_USE_DYNAMIC_PARTITIONS := true
+TARGET_HAS_GENERIC_KERNEL_HEADERS := true
+PRODUCT_TARGET_VNDK_VERSION := 31
+BOARD_SHIPPING_API_LEVEL := 31
+PRODUCT_SHIPPING_API_LEVEL := 31
+
+# Soong namespaces
+SOONG_CONFIG_NAMESPACES += ufsbsg
+SOONG_CONFIG_ufsbsg := ufsframework
+SOONG_CONFIG_ufsbsg_ufsframework := bsg
 
 # TWRP & OrangeFox extras
 TW_DEFAULT_LANGUAGE     := en
@@ -75,8 +94,3 @@ PRODUCT_PACKAGES += \
     update_verifier \
     update_engine_sideload
 
-PRODUCT_STATIC_BOOT_CONTROL_HAL := \
-    bootctrl.parrot \
-    libgptutils \
-    libz \
-    libcutils
