@@ -62,6 +62,14 @@ from `postrecoveryboot.sh` after the GUI was already up, which could make touch
 freeze. Run the same reload at the end of module loading, before the UI starts,
 and keep the post-boot call only as a marked fallback.
 
+## 0005 - recovery: guard libblkid against duplicate external/util-linux definition
+
+OrangeFox 16.0 manifests sync `external/util-linux`, which defines `libblkid` as a Soong
+shared library module. `bootable/recovery/libblkid/Android.mk` defines the same module
+name, causing Kati duplicate target definition errors (`MODULE.TARGET.SHARED_LIBRARIES.libblkid already defined by external/util-linux`).
+This patch guards `bootable/recovery/libblkid/Android.mk` with `ifeq ($(wildcard external/util-linux/Android.bp),)`
+so it yields to `external/util-linux` when present and builds cleanly without collision.
+
 ## Touch firmware
 
 Both FTS (`fts_8720`) and NVT (`nvt_36672c`) panels are supported. The firmware
