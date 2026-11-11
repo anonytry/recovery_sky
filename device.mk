@@ -14,13 +14,19 @@ $(call inherit-product, $(SRC_TARGET_DIR)/product/core_64_bit_only.mk)
 # Enable project quotas and casefolding for emulated storage without sdcardfs
 $(call inherit-product, $(SRC_TARGET_DIR)/product/emulated_storage.mk)
 
-# Enable Virtual A/B OTA
+# Enable virtual A/B OTA
+$(call inherit-product, $(SRC_TARGET_DIR)/product/virtual_ab_ota.mk)
 $(call inherit-product, $(SRC_TARGET_DIR)/product/virtual_ab_ota/launch_with_vendor_ramdisk.mk)
 
 # Enable APEX updates
 $(call inherit-product, $(SRC_TARGET_DIR)/product/updatable_apex.mk)
 
+# Installs gsi keys into ramdisk, to boot a GSI with verified boot.
+$(call inherit-product, $(SRC_TARGET_DIR)/product/developer_gsi_keys.mk)
+
 # Platform & Dynamic Partitions
+TARGET_BOARD_PLATFORM := parrot
+TARGET_BOOTLOADER_BOARD_NAME := sky
 PRODUCT_USE_DYNAMIC_PARTITIONS := true
 TARGET_HAS_GENERIC_KERNEL_HEADERS := true
 PRODUCT_TARGET_VNDK_VERSION := 31
@@ -28,8 +34,10 @@ BOARD_SHIPPING_API_LEVEL := 31
 PRODUCT_SHIPPING_API_LEVEL := 31
 
 # Soong namespaces
+PRODUCT_SOONG_NAMESPACES += $(DEVICE_PATH)
+
 SOONG_CONFIG_NAMESPACES += ufsbsg
-SOONG_CONFIG_ufsbsg := ufsframework
+SOONG_CONFIG_ufsbsg += ufsframework
 SOONG_CONFIG_ufsbsg_ufsframework := bsg
 
 # TWRP & OrangeFox extras
@@ -83,14 +91,43 @@ PRODUCT_COPY_FILES += \
     $(DEVICE_PATH)/prebuilt/aidl/lib64/android.system.keystore2-V1-ndk_platform.so:$(TARGET_COPY_OUT_RECOVERY)/root/system/lib64/android.system.keystore2-V1-ndk_platform.so
 endif
 
+# Qualcomm Decryption
+PRODUCT_PACKAGES += \
+    qcom_decrypt \
+    qcom_decrypt_fbe
+
 # Boot control HAL & update tools
 PRODUCT_PACKAGES += \
-    android.hardware.boot@1.0-impl \
-    android.hardware.boot@1.0-service \
-    bootctrl.parrot \
-    otapreopt_script \
-    cppreopts.sh \
     update_engine \
+    update_engine_client \
     update_verifier \
-    update_engine_sideload
+    update_engine_sideload \
+    android.hardware.boot@1.2-impl-qti \
+    android.hardware.boot@1.2-impl-qti.recovery \
+    android.hardware.boot@1.2-service
 
+# fastbootd
+PRODUCT_PACKAGES += \
+    fastbootd \
+    android.hardware.fastboot@1.1-impl-mock
+
+# f2fs utilities & Userdata checkpoint
+PRODUCT_PACKAGES += \
+    sg_write_buffer \
+    f2fs_io \
+    check_f2fs \
+    checkpoint_gc
+
+AB_OTA_POSTINSTALL_CONFIG += \
+    RUN_POSTINSTALL_vendor=true \
+    POSTINSTALL_PATH_vendor=bin/checkpoint_gc \
+    FILESYSTEM_TYPE_vendor=ext4 \
+    POSTINSTALL_OPTIONAL_vendor=true
+
+# OEM otacerts
+PRODUCT_EXTRA_RECOVERY_KEYS += \
+    $(DEVICE_PATH)/security/otacert \
+    vendor/recovery/security/miui
+
+# Enable Fuse Passthrough
+PRODUCT_PROPERTY_OVERRIDES += persist.sys.fuse.passthrough.enable=true

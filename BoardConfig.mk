@@ -36,7 +36,8 @@ AB_OTA_PARTITIONS += \
     vbmeta \
     vbmeta_system \
     vendor \
-    vendor_boot
+    vendor_boot \
+    vendor_dlkm
 
 # Architecture
 TARGET_ARCH := arm64
@@ -75,11 +76,11 @@ BOARD_RAMDISK_USE_LZ4 := true
 TARGET_PREBUILT_KERNEL := $(DEVICE_PATH)/prebuilt/kernel
 
 # Partitions
-BOARD_BOOTIMAGE_PARTITION_SIZE := 134217728
+BOARD_BOOTIMAGE_PARTITION_SIZE := 100663296
 BOARD_KERNEL-GKI_BOOTIMAGE_PARTITION_SIZE := $(BOARD_BOOTIMAGE_PARTITION_SIZE)
 BOARD_VENDOR_BOOTIMAGE_PARTITION_SIZE := 100663296
 BOARD_RECOVERYIMAGE_PARTITION_SIZE := 104857600
-BOARD_DTBOIMG_PARTITION_SIZE := 25165824
+BOARD_DTBOIMG_PARTITION_SIZE := 24117248
 BOARD_USERDATAIMAGE_PARTITION_SIZE := 48318382080
 BOARD_PERSISTIMAGE_PARTITION_SIZE := 33554432
 BOARD_METADATAIMAGE_PARTITION_SIZE := 16777216
@@ -114,15 +115,40 @@ TARGET_COPY_OUT_SYSTEM_EXT := system_ext
 BOARD_SYSTEM_EXTIMAGE_FILE_SYSTEM_TYPE := ext4
 
 # Dynamic / Logical Partitions
-BOARD_SUPER_PARTITION_SIZE := 6979321856
+BOARD_SUPER_PARTITION_SIZE := 9126805504
 BOARD_SUPER_PARTITION_GROUPS := qti_dynamic_partitions
-BOARD_QTI_DYNAMIC_PARTITIONS_SIZE := 6975127552 # (BOARD_SUPER_PARTITION_SIZE - 4MB)
-BOARD_QTI_DYNAMIC_PARTITIONS_PARTITION_LIST := system system_ext product vendor odm
+BOARD_QTI_DYNAMIC_PARTITIONS_SIZE := 9122611200 # (BOARD_SUPER_PARTITION_SIZE - 4MB)
+BOARD_QTI_DYNAMIC_PARTITIONS_PARTITION_LIST := system system_ext product vendor vendor_dlkm odm
 
 # Recovery
 TARGET_OTA_ASSERT_DEVICE := sky,skyin
 TARGET_RECOVERY_FSTAB := $(DEVICE_PATH)/recovery.fstab
 TARGET_RECOVERY_PIXEL_FORMAT := RGBX_8888
+
+# Recovery device modules & shared libraries
+TARGET_RECOVERY_DEVICE_MODULES += \
+    android.hidl.allocator@1.0 \
+    android.hidl.memory@1.0 \
+    android.hidl.memory.token@1.0 \
+    libdmabufheap \
+    libhidlmemory \
+    libion \
+    libnetutils \
+    vendor.display.config@1.0 \
+    vendor.display.config@2.0 \
+    libdebuggerd_client
+
+RECOVERY_LIBRARY_SOURCE_FILES += \
+    $(TARGET_OUT_SHARED_LIBRARIES)/android.hidl.allocator@1.0.so \
+    $(TARGET_OUT_SHARED_LIBRARIES)/android.hidl.memory@1.0.so \
+    $(TARGET_OUT_SHARED_LIBRARIES)/android.hidl.memory.token@1.0.so \
+    $(TARGET_OUT_SHARED_LIBRARIES)/libdmabufheap.so \
+    $(TARGET_OUT_SHARED_LIBRARIES)/libhidlmemory.so \
+    $(TARGET_OUT_SHARED_LIBRARIES)/libion.so \
+    $(TARGET_OUT_SHARED_LIBRARIES)/libnetutils.so \
+    $(TARGET_OUT_SHARED_LIBRARIES)/libdebuggerd_client.so \
+    $(TARGET_OUT_SYSTEM_EXT_SHARED_LIBRARIES)/vendor.display.config@1.0.so \
+    $(TARGET_OUT_SYSTEM_EXT_SHARED_LIBRARIES)/vendor.display.config@2.0.so
 
 # Display
 TARGET_SCREEN_DENSITY := 440
@@ -134,6 +160,10 @@ TW_BRIGHTNESS_PATH := "/sys/class/backlight/panel0-backlight/brightness"
 TW_DEFAULT_BRIGHTNESS := 547
 TW_MAX_BRIGHTNESS := 2047
 TW_CUSTOM_CPU_TEMP_PATH := "/sys/devices/virtual/thermal/thermal_zone34/temp"
+
+# Battery & RTC
+TW_USE_LEGACY_BATTERY_SERVICES := true
+TARGET_RECOVERY_QCOM_RTC_FIX := true
 TW_QCOM_ATS_OFFSET := 1666528204500
 TW_SCREEN_BLANK_ON_BOOT := true
 TW_BACKUP_EXCLUSIONS := /data/fonts/files
@@ -146,12 +176,20 @@ BOARD_AVB_RECOVERY_ROLLBACK_INDEX := 1
 BOARD_AVB_RECOVERY_ROLLBACK_INDEX_LOCATION := 1
 BOARD_AVB_MAKE_VBMETA_IMAGE_ARGS += --flags 3
 
-# Encryption & FBE
+BOARD_AVB_VBMETA_SYSTEM := system
+BOARD_AVB_VBMETA_SYSTEM_KEY_PATH := external/avb/test/data/testkey_rsa2048.pem
+BOARD_AVB_VBMETA_SYSTEM_ALGORITHM := SHA256_RSA2048
+BOARD_AVB_VBMETA_SYSTEM_ROLLBACK_INDEX := $(PLATFORM_SECURITY_PATCH_TIMESTAMP)
+BOARD_AVB_VBMETA_SYSTEM_ROLLBACK_INDEX_LOCATION := 2
+
+# Encryption & FBE Decryption
 BOARD_USES_METADATA_PARTITION := true
 BOARD_USES_QCOM_FBE_DECRYPTION := true
-PLATFORM_VERSION := 16.1.0
+TW_INCLUDE_CRYPTO := true
+PLATFORM_VERSION := 99.87.36
+PLATFORM_VERSION_LAST_STABLE := $(PLATFORM_VERSION)
 PLATFORM_SECURITY_PATCH := 2099-12-31
-VENDOR_SECURITY_PATCH := 2099-12-31
+VENDOR_SECURITY_PATCH := $(PLATFORM_SECURITY_PATCH)
 
 # Props
 TARGET_SYSTEM_PROP += $(DEVICE_PATH)/system.prop
@@ -173,8 +211,18 @@ TW_INPUT_BLACKLIST := "hbtp_vm"
 TW_USE_TOOLBOX := true
 TW_INCLUDE_REPACKTOOLS := true
 TW_INCLUDE_FASTBOOTD := true
+TW_NO_EXFAT_FUSE := true
+TW_INCLUDE_NTFS_3G := true
+TW_INCLUDE_RESETPROP := true
+TW_USE_SERIALNO_PROPERTY_FOR_DEVICE_ID := true
+TW_OVERRIDE_SYSTEM_PROPS := \
+    "ro.build.fingerprint=ro.vendor.build.fingerprint;ro.build.version.incremental"
 TARGET_USES_LOGD := true
 TWRP_INCLUDE_LOGCAT := true
+
+# WLAN & SoftAP
+OF_ENABLE_WLAN := 1
+OF_WLAN_AP := 1
 
 # Theme timezone injection (India UTC+5:30) & custom maintainer avatar
 BOARD_RECOVERY_IMAGE_PREPARE += f=$(TARGET_RECOVERY_ROOT_OUT)/twres/pages/settings.xml; if [ -f "$$f" ] && ! grep -q 'IST-5:30' "$$f"; then sed -i 's%<listitem name="{@utcp6}">%<listitem name="India (UTC+5:30)">IST-5:30</listitem><listitem name="{@utcp6}">%' "$$f"; fi;
